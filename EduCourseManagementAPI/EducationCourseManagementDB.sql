@@ -1,4 +1,4 @@
-﻿DROP DATABASE IF EXISTS EducationCourseManagementDB;
+﻿/*DROP DATABASE IF EXISTS EducationCourseManagementDB;
 CREATE DATABASE IF NOT EXISTS EducationCourseManagementDB;
 USE EducationCourseManagementDB;
 
@@ -128,3 +128,4 @@ INSERT INTO StudentCourses (StudentId, CourseId) VALUES
 (10, 9),
 (10, 10),
 (10, 2);
+*/
