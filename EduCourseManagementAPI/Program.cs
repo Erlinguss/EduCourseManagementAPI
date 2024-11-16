@@ -3,10 +3,13 @@ using EducationCourseManagement.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
-builder.Services.AddControllers();
+// Add DbContext for MySQL
 builder.Services.AddDbContext<SchoolContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
+    new MySqlServerVersion(new Version(8, 0, 21))));
+
+// Add Controllers
+builder.Services.AddControllers();
 
 // Add Swagger for API testing
 builder.Services.AddEndpointsApiExplorer();
@@ -21,10 +24,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseAuthentication();
 app.UseAuthorization();
 
+// Map controllers to endpoints
 app.MapControllers();
 
 app.Run();
-
