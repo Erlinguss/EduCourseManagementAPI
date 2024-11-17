@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using EducationCourseManagement.Data;
+using EducationCourseManagement.Services;
+using EduCourseManagementAPI.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SchoolContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
     new MySqlServerVersion(new Version(8, 0, 21))));
+
+// Add Services
+builder.Services.AddScoped<ICourseService, CourseService>(); 
 
 // Add Controllers
 builder.Services.AddControllers();
