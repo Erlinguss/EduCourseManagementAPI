@@ -1,99 +1,68 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using EducationCourseManagement.Data;
+using EducationCourseManagement.Services;
+using EducationCourseManagement.DTOs;
+using EduCourseManagementAPI.Interfaces;
 
-[Route("api/[controller]")]
-[ApiController]
-public class CoursesController : ControllerBase
+namespace EducationCourseManagement.Controllers
 {
-    private readonly SchoolContext _context;
-
-    public CoursesController(SchoolContext context)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CoursesController : ControllerBase
     {
-        _context = context;
-    }
+        private readonly ICourseService _courseService;
 
-    // GET: api/Courses
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
-    {
-        return await _context.Courses.ToListAsync();
-    }
-
-    // GET: api/Courses/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Course>> GetCourse(int id)
-    {
-        var course = await _context.Courses.FindAsync(id);
-
-        if (course == null)
+        public CoursesController(ICourseService courseService)
         {
-            return NotFound();
+            _courseService = courseService;
         }
 
-        return course;
-    }
-
-    // POST: api/Courses
-    [HttpPost]
-    public async Task<ActionResult<Course>> PostCourse(Course course)
-    {
-        _context.Courses.Add(course);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetCourse), new { id = course.CourseId }, course);
-    }
-
-    // PUT: api/Courses/5
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutCourse(int id, Course course)
-    {
-        if (id != course.CourseId)
+        // GET: api/Courses
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<CourseDTO>>> GetCourses()
         {
-            return BadRequest();
+            var courses = await _courseService.GetAllCoursesAsync();
+            return Ok(courses);
         }
 
-        _context.Entry(course).State = EntityState.Modified;
-
-        try
+        // GET: api/Courses/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CourseDTO>> GetCourse(int id)
         {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!CourseExists(id))
-            {
+            var course = await _courseService.GetCourseByIdAsync(id);
+            if (course == null)
                 return NotFound();
-            }
-            else
-            {
-                throw;
-            }
+
+            return Ok(course);
         }
 
-        return NoContent();
-    }
-
-    // DELETE: api/Courses/5
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteCourse(int id)
-    {
-        var course = await _context.Courses.FindAsync(id);
-        if (course == null)
+        // POST: api/Courses
+        [HttpPost]
+        public async Task<ActionResult<CourseDTO>> PostCourse(CourseDTO courseDTO)
         {
-            return NotFound();
+            var createdCourse = await _courseService.CreateCourseAsync(courseDTO);
+            return CreatedAtAction(nameof(GetCourse), new { id = createdCourse.CourseId }, createdCourse);
         }
 
-        _context.Courses.Remove(course);
-        await _context.SaveChangesAsync();
+        // PUT: api/Courses/id
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutCourse(int id, CourseDTO courseDTO)
+        {
+            var updated = await _courseService.UpdateCourseAsync(id, courseDTO);
+            if (!updated)
+                return NotFound();
 
-        return NoContent();
-    }
+            return NoContent();
+        }
 
-    private bool CourseExists(int id)
-    {
-        return _context.Courses.Any(e => e.CourseId == id);
+        // DELETE: api/Courses/id
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCourse(int id)
+        {
+            var deleted = await _courseService.DeleteCourseAsync(id);
+            if (!deleted)
+                return NotFound();
+
+            return NoContent();
+        }
     }
 }
-
-
