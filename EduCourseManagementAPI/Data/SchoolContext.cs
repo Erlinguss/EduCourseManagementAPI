@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EducationCourseManagement.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace EducationCourseManagement.Data
 {
@@ -7,10 +8,12 @@ namespace EducationCourseManagement.Data
         public SchoolContext(DbContextOptions<SchoolContext> options) : base(options) { }
 
         public DbSet<Course> Courses { get; set; }
+        public DbSet<Student> Students { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Course>().ToTable("Courses");
+            modelBuilder.Entity<Student>().ToTable("Students");
         }
     }
 }
