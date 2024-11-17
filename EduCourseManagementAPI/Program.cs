@@ -11,7 +11,8 @@ builder.Services.AddDbContext<SchoolContext>(options =>
     new MySqlServerVersion(new Version(8, 0, 21))));
 
 // Add Services
-builder.Services.AddScoped<ICourseService, CourseService>(); 
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
 
 // Add Controllers
 builder.Services.AddControllers();
