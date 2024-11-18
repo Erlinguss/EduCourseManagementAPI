@@ -14,6 +14,7 @@ builder.Services.AddDbContext<SchoolContext>(options =>
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IInstructorService, InstructorService>();
+builder.Services.AddScoped<IScheduleService, ScheduleService>();
 
 
 // Add Controllers
