@@ -7,7 +7,7 @@
     public string TimeSlot { get; set; }
 
 
-  /*  // Navigation properties
+    // Navigation properties
     public Course Course { get; set; }
-    public Instructor Instructor { get; set; }*/
+    public Instructor Instructor { get; set; }
 }

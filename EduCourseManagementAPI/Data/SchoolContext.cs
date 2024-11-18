@@ -10,6 +10,7 @@ namespace EducationCourseManagement.Data
         public DbSet<Course> Courses { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Instructor> Instructors { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -17,6 +18,7 @@ namespace EducationCourseManagement.Data
             modelBuilder.Entity<Course>().ToTable("Courses");
             modelBuilder.Entity<Student>().ToTable("Students");
             modelBuilder.Entity<Instructor>().ToTable("Instructors");
+            modelBuilder.Entity<Schedule>().ToTable("Schedules");
         }
     }
 }
