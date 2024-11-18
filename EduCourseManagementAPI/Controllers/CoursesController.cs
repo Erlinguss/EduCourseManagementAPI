@@ -24,7 +24,7 @@ namespace EducationCourseManagement.Controllers
             return Ok(courses);
         }
 
-        // GET: api/Courses/5
+        // GET: api/Courses/id
         [HttpGet("{id}")]
         public async Task<ActionResult<CourseDTO>> GetCourse(int id)
         {
