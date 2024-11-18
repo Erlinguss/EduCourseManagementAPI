@@ -5,6 +5,6 @@
     public string Description { get; set; }
     public int Credits { get; set; }
 
-/*    // Navigation property for related schedules
-    public ICollection<Schedule> Schedules { get; set; }*/
+    // Navigation property for related schedules
+    public ICollection<Schedule> Schedules { get; set; }
 }
