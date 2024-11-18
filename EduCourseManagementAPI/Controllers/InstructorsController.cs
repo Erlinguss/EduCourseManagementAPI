@@ -34,6 +34,34 @@ namespace EducationCourseManagement.Controllers
             return Ok(instructor);
         }
 
+        // POST: api/Instructors
+        [HttpPost]
+        public async Task<ActionResult<InstructorDTO>> PostInstructor(InstructorDTO instructorDTO)
+        {
+            var createdInstructor = await _instructorService.CreateInstructorAsync(instructorDTO);
+            return CreatedAtAction(nameof(GetInstructor), new { id = createdInstructor.InstructorId }, createdInstructor);
+        }
 
+        // PUT: api/Instructors/id
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutInstructor(int id, InstructorDTO instructorDTO)
+        {
+            var updated = await _instructorService.UpdateInstructorAsync(id, instructorDTO);
+
+            if (!updated) return NotFound();
+
+            return NoContent();
+        }
+
+        // DELETE: api/Instructors/id
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteInstructor(int id)
+        {
+            var deleted = await _instructorService.DeleteInstructorAsync(id);
+
+            if (!deleted) return NotFound();
+
+            return NoContent();
+        }
     }
 }
