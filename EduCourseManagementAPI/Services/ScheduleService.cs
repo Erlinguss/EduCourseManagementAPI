@@ -52,6 +52,22 @@ namespace EducationCourseManagement.Services
 
         public async Task<ScheduleDTO> CreateScheduleAsync(ScheduleDTO scheduleDTO)
         {
+            if (scheduleDTO.CourseId <= 0 || scheduleDTO.InstructorId <= 0)
+                throw new ArgumentException("CourseId and InstructorId are required.");
+
+            if (string.IsNullOrWhiteSpace(scheduleDTO.TimeSlot))
+                throw new ArgumentException("TimeSlot is required.");
+
+            // Validate foreign keys
+            var courseExists = await _context.Courses.AnyAsync(c => c.CourseId == scheduleDTO.CourseId);
+            var instructorExists = await _context.Instructors.AnyAsync(i => i.InstructorId == scheduleDTO.InstructorId);
+
+            if (!courseExists)
+                throw new InvalidOperationException($"Course with ID {scheduleDTO.CourseId} does not exist.");
+
+            if (!instructorExists)
+                throw new InvalidOperationException($"Instructor with ID {scheduleDTO.InstructorId} does not exist.");
+
             var schedule = new Schedule
             {
                 CourseId = scheduleDTO.CourseId,
@@ -67,22 +83,6 @@ namespace EducationCourseManagement.Services
             return scheduleDTO;
         }
 
-        /* public async Task<bool> UpdateScheduleAsync(int id, ScheduleDTO scheduleDTO)
-         {
-             var schedule = await _context.Schedules.FindAsync(id);
-
-             if (schedule == null) return false;
-
-             schedule.CourseId = scheduleDTO.CourseId;
-             schedule.InstructorId = scheduleDTO.InstructorId;
-             schedule.Date = scheduleDTO.Date;
-             schedule.TimeSlot = scheduleDTO.TimeSlot;
-
-             _context.Schedules.Update(schedule);
-             await _context.SaveChangesAsync();
-
-             return true;
-         }*/
 
         public async Task<bool> UpdateScheduleAsync(int id, ScheduleDTO scheduleDTO)
         {

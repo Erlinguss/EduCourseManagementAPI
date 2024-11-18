@@ -45,6 +45,12 @@ namespace EducationCourseManagement.Services
 
         public async Task<CourseDTO> CreateCourseAsync(CourseDTO courseDTO)
         {
+            if (string.IsNullOrWhiteSpace(courseDTO.Title))
+                throw new ArgumentException("Title is required.");
+
+            if (courseDTO.Credits <= 0)
+                throw new ArgumentException("Credits must be greater than 0.");
+
             var course = new Course
             {
                 Title = courseDTO.Title,
@@ -55,7 +61,7 @@ namespace EducationCourseManagement.Services
             _context.Courses.Add(course);
             await _context.SaveChangesAsync();
 
-            courseDTO.CourseId = course.CourseId; 
+            courseDTO.CourseId = course.CourseId;
             return courseDTO;
         }
 
@@ -63,7 +69,13 @@ namespace EducationCourseManagement.Services
         {
             var course = await _context.Courses.FindAsync(id);
             if (course == null)
-                return false;
+                throw new KeyNotFoundException($"Course with ID {id} not found.");
+
+            if (string.IsNullOrWhiteSpace(courseDTO.Title))
+                throw new ArgumentException("Title is required.");
+
+            if (courseDTO.Credits <= 0)
+                throw new ArgumentException("Credits must be greater than 0.");
 
             course.Title = courseDTO.Title;
             course.Description = courseDTO.Description;
