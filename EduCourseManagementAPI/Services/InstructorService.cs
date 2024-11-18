@@ -42,6 +42,15 @@ namespace EducationCourseManagement.Services
 
         public async Task<InstructorDTO> CreateInstructorAsync(InstructorDTO instructorDTO)
         {
+            if (string.IsNullOrWhiteSpace(instructorDTO.Name))
+                throw new ArgumentException("Name is required.");
+
+            if (string.IsNullOrWhiteSpace(instructorDTO.Email))
+                throw new ArgumentException("Email is required.");
+
+            if (await _context.Instructors.AnyAsync(i => i.Email == instructorDTO.Email))
+                throw new InvalidOperationException("An instructor with this email already exists.");
+
             var instructor = new Instructor
             {
                 Name = instructorDTO.Name,
