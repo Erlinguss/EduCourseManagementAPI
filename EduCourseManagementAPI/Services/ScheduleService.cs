@@ -67,5 +67,33 @@ namespace EducationCourseManagement.Services
             return scheduleDTO;
         }
 
+        public async Task<bool> UpdateScheduleAsync(int id, ScheduleDTO scheduleDTO)
+        {
+            var schedule = await _context.Schedules.FindAsync(id);
+
+            if (schedule == null) return false;
+
+            schedule.CourseId = scheduleDTO.CourseId;
+            schedule.InstructorId = scheduleDTO.InstructorId;
+            schedule.Date = scheduleDTO.Date;
+            schedule.TimeSlot = scheduleDTO.TimeSlot;
+
+            _context.Schedules.Update(schedule);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> DeleteScheduleAsync(int id)
+        {
+            var schedule = await _context.Schedules.FindAsync(id);
+
+            if (schedule == null) return false;
+
+            _context.Schedules.Remove(schedule);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
