@@ -32,6 +32,32 @@ namespace EducationCourseManagement.Controllers
             return Ok(schedule);
         }
 
-   
+        [HttpPost]
+        public async Task<ActionResult<ScheduleDTO>> PostSchedule(ScheduleDTO scheduleDTO)
+        {
+            var createdSchedule = await _scheduleService.CreateScheduleAsync(scheduleDTO);
+            return CreatedAtAction(nameof(GetSchedule), new { id = createdSchedule.ScheduleId }, createdSchedule);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutSchedule(int id, ScheduleDTO scheduleDTO)
+        {
+            var updated = await _scheduleService.UpdateScheduleAsync(id, scheduleDTO);
+
+            if (!updated) return NotFound();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSchedule(int id)
+        {
+            var deleted = await _scheduleService.DeleteScheduleAsync(id);
+
+            if (!deleted) return NotFound();
+
+            return NoContent();
+        }
+    }
 }
 
