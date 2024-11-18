@@ -7,6 +7,6 @@
         public string Email { get; set; }
 
         // Navigation property for the many-to-many relationship with Courses
-/*        public ICollection<StudentCourse> StudentCourses { get; set; }*/
+        public ICollection<StudentCourse> StudentCourses { get; set; }
     }
 }
