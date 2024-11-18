@@ -1,11 +1,25 @@
-﻿namespace EducationCourseManagement.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+using Xunit.Sdk;
+
+namespace EducationCourseManagement.DTOs
 {
     public class ScheduleDTO
     {
         public int ScheduleId { get; set; }
+
+        [Required(ErrorMessage = "CourseId is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid CourseId.")]
         public int CourseId { get; set; }
+
+        [Required(ErrorMessage = "InstructorId is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid InstructorId.")]
         public int InstructorId { get; set; }
+
+        [Required(ErrorMessage = "Date is required.")]
         public DateTime Date { get; set; }
+
+        [Required(ErrorMessage = "TimeSlot is required.")]
+        [StringLength(50, ErrorMessage = "TimeSlot cannot exceed 50 characters.")]
         public string TimeSlot { get; set; }
     }
 }
