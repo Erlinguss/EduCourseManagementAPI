@@ -40,6 +40,46 @@ namespace EducationCourseManagement.Services
             };
         }
 
-        
+        public async Task<InstructorDTO> CreateInstructorAsync(InstructorDTO instructorDTO)
+        {
+            var instructor = new Instructor
+            {
+                Name = instructorDTO.Name,
+                Email = instructorDTO.Email
+            };
+
+            _context.Instructors.Add(instructor);
+            await _context.SaveChangesAsync();
+
+            instructorDTO.InstructorId = instructor.InstructorId;
+            return instructorDTO;
+        }
+
+        public async Task<bool> UpdateInstructorAsync(int id, InstructorDTO instructorDTO)
+        {
+            var instructor = await _context.Instructors.FindAsync(id);
+
+            if (instructor == null) return false;
+
+            instructor.Name = instructorDTO.Name;
+            instructor.Email = instructorDTO.Email;
+
+            _context.Instructors.Update(instructor);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> DeleteInstructorAsync(int id)
+        {
+            var instructor = await _context.Instructors.FindAsync(id);
+
+            if (instructor == null) return false;
+
+            _context.Instructors.Remove(instructor);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
