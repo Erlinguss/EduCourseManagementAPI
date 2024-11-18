@@ -13,6 +13,8 @@ builder.Services.AddDbContext<SchoolContext>(options =>
 // Add Services
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IInstructorService, InstructorService>();
+
 
 // Add Controllers
 builder.Services.AddControllers();
