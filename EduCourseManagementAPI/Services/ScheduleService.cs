@@ -67,11 +67,35 @@ namespace EducationCourseManagement.Services
             return scheduleDTO;
         }
 
+        /* public async Task<bool> UpdateScheduleAsync(int id, ScheduleDTO scheduleDTO)
+         {
+             var schedule = await _context.Schedules.FindAsync(id);
+
+             if (schedule == null) return false;
+
+             schedule.CourseId = scheduleDTO.CourseId;
+             schedule.InstructorId = scheduleDTO.InstructorId;
+             schedule.Date = scheduleDTO.Date;
+             schedule.TimeSlot = scheduleDTO.TimeSlot;
+
+             _context.Schedules.Update(schedule);
+             await _context.SaveChangesAsync();
+
+             return true;
+         }*/
+
         public async Task<bool> UpdateScheduleAsync(int id, ScheduleDTO scheduleDTO)
         {
             var schedule = await _context.Schedules.FindAsync(id);
+            if (schedule == null)
+                return false;
 
-            if (schedule == null) return false;
+            // Validate foreign keys
+            var courseExists = await _context.Courses.AnyAsync(c => c.CourseId == scheduleDTO.CourseId);
+            var instructorExists = await _context.Instructors.AnyAsync(i => i.InstructorId == scheduleDTO.InstructorId);
+
+            if (!courseExists || !instructorExists)
+                throw new InvalidOperationException("Invalid CourseId or InstructorId.");
 
             schedule.CourseId = scheduleDTO.CourseId;
             schedule.InstructorId = scheduleDTO.InstructorId;
@@ -83,6 +107,7 @@ namespace EducationCourseManagement.Services
 
             return true;
         }
+
 
         public async Task<bool> DeleteScheduleAsync(int id)
         {
