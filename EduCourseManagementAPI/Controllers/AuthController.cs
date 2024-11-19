@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using EducationCourseManagement.Services;
+using EducationCourseManagement.Models;
 
 namespace EducationCourseManagement.Controllers
 {
@@ -15,7 +16,7 @@ namespace EducationCourseManagement.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest request)
+        public IActionResult Login([FromBody] Login request)
         {
             // Mock user validation
             if (request.Username == "admin" && request.Password == "admindkit")
