@@ -30,7 +30,8 @@ namespace EducationCourseManagement.Services
         {
             var instructor = await _context.Instructors.FindAsync(id);
 
-            if (instructor == null) return null;
+            if (instructor == null)
+                return null;
 
             return new InstructorDTO
             {
@@ -83,7 +84,8 @@ namespace EducationCourseManagement.Services
         {
             var instructor = await _context.Instructors.FindAsync(id);
 
-            if (instructor == null) return false;
+            if (instructor == null) 
+                return false;
 
             _context.Instructors.Remove(instructor);
             await _context.SaveChangesAsync();
