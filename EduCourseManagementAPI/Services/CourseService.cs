@@ -51,6 +51,11 @@ namespace EducationCourseManagement.Services
             if (courseDTO.Credits <= 0)
                 throw new ArgumentException("Credits must be greater than 0.");
 
+            if (await _context.Courses.AnyAsync(c => c.Title == courseDTO.Title))
+            {
+                throw new InvalidOperationException($"A course with the title '{courseDTO.Title}' already exists.");
+            }
+
             var course = new Course
             {
                 Title = courseDTO.Title,
