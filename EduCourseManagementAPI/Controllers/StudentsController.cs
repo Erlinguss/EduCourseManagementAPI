@@ -19,7 +19,7 @@ namespace EducationCourseManagement.Controllers
 
         // GET: api/Students
         [HttpGet]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin,Instructor")] 
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudents()
         {
             var students = await _studentService.GetAllStudentsAsync();
@@ -28,7 +28,7 @@ namespace EducationCourseManagement.Controllers
 
         // GET: api/Students/id
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Student")] 
+        [Authorize(Roles = "Admin,Student,Instructor")] 
         public async Task<ActionResult<StudentDTO>> GetStudent(int id)
         {
             var student = await _studentService.GetStudentByIdAsync(id);
