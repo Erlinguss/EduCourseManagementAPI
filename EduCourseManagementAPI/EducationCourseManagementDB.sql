@@ -2,13 +2,33 @@
 CREATE DATABASE IF NOT EXISTS EducationCourseManagementDB;
 USE EducationCourseManagementDB;
 
-
+-- Drop existing tables
 DROP TABLE IF EXISTS StudentCourses;
 DROP TABLE IF EXISTS Schedules;
 DROP TABLE IF EXISTS Students;
 DROP TABLE IF EXISTS Courses;
 DROP TABLE IF EXISTS Instructors;
 DROP TABLE IF EXISTS Rooms;
+DROP TABLE IF EXISTS Users;
+
+-- Create Users Table
+CREATE TABLE Users (
+    UserId INT PRIMARY KEY AUTO_INCREMENT,
+    Username NVARCHAR(100) UNIQUE NOT NULL,
+    Password NVARCHAR(255) NOT NULL,
+    Role NVARCHAR(50) NOT NULL -- Admin, Instructor, Student
+);
+
+-- Insert Users Data
+INSERT INTO Users (Username, Password, Role) VALUES
+('PeterAdmin', 'admindkit', 'Admin'),
+('JohnInstructor', 'instructordkit', 'Instructor'),
+('EmilyInstructor', 'emily123', 'Instructor'),
+('MichaelInstructor', 'michael123', 'Instructor'),
+('LauraInstructor', 'laura123', 'Instructor'),
+('DavidStudent', 'studentdkit', 'Student'),
+('AliceStudent', 'alice123', 'Student'),
+('BobStudent', 'bob123', 'Student');
 
 -- Create Rooms Table
 CREATE TABLE Rooms (
@@ -17,7 +37,7 @@ CREATE TABLE Rooms (
     Capacity INT NOT NULL
 );
 
--- Insert Sample Data into Rooms
+-- Insert Rooms Data
 INSERT INTO Rooms (RoomName, Capacity) VALUES
 ('Room A', 30),
 ('Room B', 50),
@@ -25,7 +45,7 @@ INSERT INTO Rooms (RoomName, Capacity) VALUES
 ('Room D', 40),
 ('Room E', 35);
 
-
+-- Create Courses Table
 CREATE TABLE Courses (
     CourseId INT PRIMARY KEY AUTO_INCREMENT,
     Title NVARCHAR(100) NOT NULL,
@@ -33,54 +53,43 @@ CREATE TABLE Courses (
     Credits INT NOT NULL
 );
 
-
+-- Insert Courses Data
 INSERT INTO Courses (Title, Description, Credits) VALUES 
 ('Introduction to Programming', 'Basic programming concepts', 3),
 ('Data Structures', 'In-depth look at data structures', 4),
 ('Database Systems', 'Introduction to relational databases', 3),
-('Web Development', 'Building websites with HTML, CSS, and JavaScript', 3),
-('Software Engineering', 'Principles of software design and architecture', 4),
-('Machine Learning', 'Basics of machine learning and data science', 3),
-('Computer Networks', 'Fundamentals of networking and protocols', 3),
-('Artificial Intelligence', 'Intro to AI and its applications', 4),
-('Operating Systems', 'Principles of operating systems', 4),
-('Cyber Security', 'Foundations of security in computer systems', 3);
+('Web Development', 'Building websites with HTML, CSS, and JavaScript', 3);
 
-
+-- Create Students Table
 CREATE TABLE Students (
     StudentId INT PRIMARY KEY AUTO_INCREMENT,
+    UserId INT UNIQUE, -- Link to Users table
     Name NVARCHAR(100) NOT NULL,
-    Email NVARCHAR(100) UNIQUE NOT NULL
+    Email NVARCHAR(100) UNIQUE NOT NULL,
+    FOREIGN KEY (UserId) REFERENCES Users(UserId)
 );
 
+-- Insert Students Data
+INSERT INTO Students (UserId, Name, Email) VALUES
+(6, 'David Student', 'david.student@dkit.com'),
+(7, 'Alice Student', 'alice.student@dkit.com'),
+(8, 'Bob Student', 'bob.student@dkit.com');
 
-INSERT INTO Students (Name, Email) VALUES
-('Alice Johnson', 'alice.johnson@dkit.com'),
-('Bob Smith', 'bob.smith@dkit.com'),
-('Charlie Brown', 'charlie.brown@dkit.com'),
-('Dana White', 'dana.white@dkit.com'),
-('Eve Black', 'eve.black@dkit.com'),
-('Frank Martin', 'frank.martin@dkit.com'),
-('Grace Lee', 'grace.lee@dkit.com'),
-('Hannah Adams', 'hannah.adams@dkit.com'),
-('Ian Curtis', 'ian.curtis@dkit.com'),
-('Jane Doe', 'jane.doe@dkit.com');
-
-
+-- Create Instructors Table
 CREATE TABLE Instructors (
     InstructorId INT PRIMARY KEY AUTO_INCREMENT,
+    UserId INT UNIQUE, -- Link to Users table
     Name NVARCHAR(100) NOT NULL,
-    Email NVARCHAR(100) UNIQUE NOT NULL
+    Email NVARCHAR(100) UNIQUE NOT NULL,
+    FOREIGN KEY (UserId) REFERENCES Users(UserId)
 );
 
-
-INSERT INTO Instructors (Name, Email) VALUES
-('Dr. Emily Thompson', 'emily.thompson@dkit.com'),
-('Prof. Michael Green', 'michael.green@dkit.com'),
-('Dr. Laura White', 'laura.white@dkit.com'),
-('Prof. Robert King', 'robert.king@dkit.com'),
-('Dr. Susan Black', 'susan.black@dkit.com');
-
+-- Insert Instructors Data
+INSERT INTO Instructors (UserId, Name, Email) VALUES
+(2, 'John Instructor', 'john.instructor@dkit.com'),
+(3, 'Emily Instructor', 'emily.instructor@dkit.com'),
+(4, 'Michael Instructor', 'michael.instructor@dkit.com'),
+(5, 'Laura Instructor', 'laura.instructor@dkit.com');
 
 -- Create Schedules Table
 CREATE TABLE Schedules (
@@ -95,17 +104,12 @@ CREATE TABLE Schedules (
     FOREIGN KEY (RoomId) REFERENCES Rooms(RoomId)
 );
 
+-- Insert Schedules Data
 INSERT INTO Schedules (CourseId, InstructorId, RoomId, Date, TimeSlot) VALUES
 (1, 1, 1, '2024-11-20 09:00:00', '9:00 AM - 10:30 AM'),
 (2, 2, 2, '2024-11-21 11:00:00', '11:00 AM - 12:30 PM'),
-(3, 1, 3, '2024-11-22 10:00:00', '10:00 AM - 11:30 AM'),
-(4, 3, 4, '2024-11-23 09:00:00', '9:00 AM - 10:30 AM'),
-(5, 2, 5, '2024-11-24 11:00:00', '11:00 AM - 12:30 PM'),
-(6, 4, 1, '2024-11-25 13:00:00', '1:00 PM - 2:30 PM'),
-(7, 5, 2, '2024-11-26 14:00:00', '2:00 PM - 3:30 PM'),
-(8, 3, 3, '2024-11-27 10:00:00', '10:00 AM - 11:30 AM'),
-(9, 4, 4, '2024-11-28 09:00:00', '9:00 AM - 10:30 AM'),
-(10, 5, 5, '2024-11-29 13:00:00', '1:00 PM - 2:30 PM');
+(3, 3, 3, '2024-11-22 10:00:00', '10:00 AM - 11:30 AM'),
+(4, 4, 4, '2024-11-23 09:00:00', '9:00 AM - 10:30 AM');
 
 
 CREATE TABLE StudentCourses (
@@ -116,34 +120,16 @@ CREATE TABLE StudentCourses (
     FOREIGN KEY (CourseId) REFERENCES Courses(CourseId)
 );
 
-
 INSERT INTO StudentCourses (StudentId, CourseId) VALUES
-(1, 1),
-(1, 2),
-(1, 5),
-(2, 3),
-(2, 4),
-(2, 6),
-(3, 1),
-(3, 7),
-(3, 10),
-(4, 8),
-(4, 5),
-(4, 6),
-(5, 1),
-(5, 9),
-(5, 4),
-(6, 3),
-(6, 7),
-(6, 2),
-(7, 8),
-(7, 5),
-(7, 3),
-(8, 10),
-(8, 6),
-(9, 4),
-(9, 5),
-(10, 9),
-(10, 10),
-(10, 2);
+(1, 1), 
+(1, 2), 
+(1, 3), 
+(2, 3), 
+(2, 4), 
+(3, 1), 
+(3, 2), 
+(3, 4);
+
 */
+
+

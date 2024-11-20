@@ -47,8 +47,6 @@ using Microsoft.EntityFrameworkCore;
 using EducationCourseManagement.Services;
 using EducationCourseManagement.Models;
 using EducationCourseManagement.Data;
-using Microsoft.CodeAnalysis.Scripting;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace EducationCourseManagement.Controllers
 {
@@ -66,12 +64,12 @@ namespace EducationCourseManagement.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] Login request)
+        public async Task<IActionResult> Login ([FromBody] User request)
         {
             // Retrieve the user from the database
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            if (user == null || user.Password != request.Password) 
             {
                 return Unauthorized("Invalid username or password.");
             }
@@ -80,6 +78,7 @@ namespace EducationCourseManagement.Controllers
             var token = _tokenService.GenerateToken(user.Role);
             return Ok(new { Token = token });
         }
+
     }
 }
 
