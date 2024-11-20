@@ -40,7 +40,7 @@ namespace EducationCourseManagement.Controllers
 
         // POST: api/Schedules
         [HttpPost]
-        [Authorize(Roles = "Admin,Instructor")] 
+        [Authorize(Roles = "Admin")] 
         public async Task<ActionResult<ScheduleDTO>> PostSchedule(ScheduleDTO scheduleDTO)
         {
             var createdSchedule = await _scheduleService.CreateScheduleAsync(scheduleDTO);
@@ -49,7 +49,7 @@ namespace EducationCourseManagement.Controllers
 
         // PUT: api/Schedules/id
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Instructor")] 
+        [Authorize(Roles = "Admin")] 
         public async Task<IActionResult> PutSchedule(int id, ScheduleDTO scheduleDTO)
         {
             var updated = await _scheduleService.UpdateScheduleAsync(id, scheduleDTO);

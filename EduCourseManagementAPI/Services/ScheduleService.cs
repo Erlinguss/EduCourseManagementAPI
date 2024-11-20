@@ -1,5 +1,6 @@
 ﻿using EducationCourseManagement.Data;
 using EducationCourseManagement.DTOs;
+using EducationCourseManagement.Models;
 using EduCourseManagementAPI.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,109 +17,177 @@ namespace EducationCourseManagement.Services
 
         public async Task<IEnumerable<ScheduleDTO>> GetAllSchedulesAsync()
         {
-            var schedules = await _context.Schedules
-                .Include(s => s.Course)
-                .Include(s => s.Instructor)
-                .ToListAsync();
-
-            return schedules.Select(s => new ScheduleDTO
+            try
             {
-                ScheduleId = s.ScheduleId,
-                CourseId = s.CourseId,
-                InstructorId = s.InstructorId,
-                Date = s.Date,
-                TimeSlot = s.TimeSlot
-            });
+                var schedules = await _context.Schedules
+                    .Include(s => s.Course)
+                    .Include(s => s.Instructor)
+                    .Include(s => s.Room)
+                    .ToListAsync();
+
+                return schedules.Select(s => new ScheduleDTO
+                {
+                    ScheduleId = s.ScheduleId,
+                    CourseId = s.CourseId,
+                    InstructorId = s.InstructorId,
+                    RoomId = s.RoomId,
+                    Date = s.Date,
+                    TimeSlot = s.TimeSlot
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error fetching all schedules: {ex.Message}", ex);
+            }
         }
 
         public async Task<ScheduleDTO> GetScheduleByIdAsync(int id)
         {
-            var schedule = await _context.Schedules
-                .Include(s => s.Course)
-                .Include(s => s.Instructor)
-                .FirstOrDefaultAsync(s => s.ScheduleId == id);
-
-            if (schedule == null) return null;
-
-            return new ScheduleDTO
+            try
             {
-                ScheduleId = schedule.ScheduleId,
-                CourseId = schedule.CourseId,
-                InstructorId = schedule.InstructorId,
-                Date = schedule.Date,
-                TimeSlot = schedule.TimeSlot
-            };
+                var schedule = await _context.Schedules
+                    .Include(s => s.Course)
+                    .Include(s => s.Instructor)
+                    .Include(s => s.Room)
+                    .FirstOrDefaultAsync(s => s.ScheduleId == id);
+
+                if (schedule == null)
+                    throw new KeyNotFoundException($"Schedule with ID {id} not found.");
+
+                return new ScheduleDTO
+                {
+                    ScheduleId = schedule.ScheduleId,
+                    CourseId = schedule.CourseId,
+                    InstructorId = schedule.InstructorId,
+                    RoomId = schedule.RoomId,
+                    Date = schedule.Date,
+                    TimeSlot = schedule.TimeSlot
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error fetching schedule by ID: {ex.Message}", ex);
+            }
         }
 
         public async Task<ScheduleDTO> CreateScheduleAsync(ScheduleDTO scheduleDTO)
         {
-            if (scheduleDTO.CourseId <= 0 || scheduleDTO.InstructorId <= 0)
-                throw new ArgumentException("CourseId and InstructorId are required.");
-
-            if (string.IsNullOrWhiteSpace(scheduleDTO.TimeSlot))
-                throw new ArgumentException("TimeSlot is required.");
-
-            // Validate foreign keys
-            var courseExists = await _context.Courses.AnyAsync(c => c.CourseId == scheduleDTO.CourseId);
-            var instructorExists = await _context.Instructors.AnyAsync(i => i.InstructorId == scheduleDTO.InstructorId);
-
-            if (!courseExists)
-                throw new InvalidOperationException($"Course with ID {scheduleDTO.CourseId} does not exist.");
-
-            if (!instructorExists)
-                throw new InvalidOperationException($"Instructor with ID {scheduleDTO.InstructorId} does not exist.");
-
-            var schedule = new Schedule
+            try
             {
-                CourseId = scheduleDTO.CourseId,
-                InstructorId = scheduleDTO.InstructorId,
-                Date = scheduleDTO.Date,
-                TimeSlot = scheduleDTO.TimeSlot
-            };
+                // Validate room availability
+                var isRoomAvailable = await _context.Schedules.AnyAsync(s =>
+                    s.RoomId == scheduleDTO.RoomId &&
+                    s.Date.Date == scheduleDTO.Date.Date &&
+                    s.TimeSlot == scheduleDTO.TimeSlot);
+                if (isRoomAvailable)
+                    throw new InvalidOperationException("The room is already booked for the specified time slot.");
 
-            _context.Schedules.Add(schedule);
-            await _context.SaveChangesAsync();
+                // Validate instructor availability
+                var isInstructorAvailable = await _context.Schedules.AnyAsync(s =>
+                    s.InstructorId == scheduleDTO.InstructorId &&
+                    s.Date.Date == scheduleDTO.Date.Date &&
+                    s.TimeSlot == scheduleDTO.TimeSlot);
+                if (isInstructorAvailable)
+                    throw new InvalidOperationException("The instructor is already booked for the specified time slot.");
 
-            scheduleDTO.ScheduleId = schedule.ScheduleId;
-            return scheduleDTO;
+                // Validate course availability
+                var isCourseAvailable = await _context.Schedules.AnyAsync(s =>
+                    s.CourseId == scheduleDTO.CourseId &&
+                    s.Date.Date == scheduleDTO.Date.Date &&
+                    s.TimeSlot == scheduleDTO.TimeSlot);
+                if (isCourseAvailable)
+                    throw new InvalidOperationException("The course is already scheduled for the specified time slot.");
+
+                var schedule = new Schedule
+                {
+                    CourseId = scheduleDTO.CourseId,
+                    InstructorId = scheduleDTO.InstructorId,
+                    RoomId = scheduleDTO.RoomId,
+                    Date = scheduleDTO.Date,
+                    TimeSlot = scheduleDTO.TimeSlot
+                };
+
+                _context.Schedules.Add(schedule);
+                await _context.SaveChangesAsync();
+
+                scheduleDTO.ScheduleId = schedule.ScheduleId;
+                return scheduleDTO;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error creating schedule: {ex.Message}", ex);
+            }
         }
-
 
         public async Task<bool> UpdateScheduleAsync(int id, ScheduleDTO scheduleDTO)
         {
-            var schedule = await _context.Schedules.FindAsync(id);
-            if (schedule == null)
-                return false;
+            try
+            {
+                var schedule = await _context.Schedules.FindAsync(id);
+                if (schedule == null)
+                    throw new KeyNotFoundException($"Schedule with ID {id} not found.");
 
-            // Validate foreign keys
-            var courseExists = await _context.Courses.AnyAsync(c => c.CourseId == scheduleDTO.CourseId);
-            var instructorExists = await _context.Instructors.AnyAsync(i => i.InstructorId == scheduleDTO.InstructorId);
+                // Revalidate room availability
+                var isRoomAvailable = await _context.Schedules.AnyAsync(s =>
+                    s.RoomId == scheduleDTO.RoomId &&
+                    s.Date.Date == scheduleDTO.Date.Date &&
+                    s.TimeSlot == scheduleDTO.TimeSlot &&
+                    s.ScheduleId != id);
+                if (isRoomAvailable)
+                    throw new InvalidOperationException("The room is already booked for the specified time slot.");
 
-            if (!courseExists || !instructorExists)
-                throw new InvalidOperationException("Invalid CourseId or InstructorId.");
+                // Revalidate instructor availability
+                var isInstructorAvailable = await _context.Schedules.AnyAsync(s =>
+                    s.InstructorId == scheduleDTO.InstructorId &&
+                    s.Date.Date == scheduleDTO.Date.Date &&
+                    s.TimeSlot == scheduleDTO.TimeSlot &&
+                    s.ScheduleId != id);
+                if (isInstructorAvailable)
+                    throw new InvalidOperationException("The instructor is already booked for the specified time slot.");
 
-            schedule.CourseId = scheduleDTO.CourseId;
-            schedule.InstructorId = scheduleDTO.InstructorId;
-            schedule.Date = scheduleDTO.Date;
-            schedule.TimeSlot = scheduleDTO.TimeSlot;
+                // Revalidate course availability
+                var isCourseAvailable = await _context.Schedules.AnyAsync(s =>
+                    s.CourseId == scheduleDTO.CourseId &&
+                    s.Date.Date == scheduleDTO.Date.Date &&
+                    s.TimeSlot == scheduleDTO.TimeSlot &&
+                    s.ScheduleId != id);
+                if (isCourseAvailable)
+                    throw new InvalidOperationException("The course is already scheduled for the specified time slot.");
 
-            _context.Schedules.Update(schedule);
-            await _context.SaveChangesAsync();
+                schedule.CourseId = scheduleDTO.CourseId;
+                schedule.InstructorId = scheduleDTO.InstructorId;
+                schedule.RoomId = scheduleDTO.RoomId;
+                schedule.Date = scheduleDTO.Date;
+                schedule.TimeSlot = scheduleDTO.TimeSlot;
 
-            return true;
+                _context.Schedules.Update(schedule);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error updating schedule: {ex.Message}", ex);
+            }
         }
-
 
         public async Task<bool> DeleteScheduleAsync(int id)
         {
-            var schedule = await _context.Schedules.FindAsync(id);
+            try
+            {
+                var schedule = await _context.Schedules.FindAsync(id);
+                if (schedule == null)
+                    throw new KeyNotFoundException($"Schedule with ID {id} not found.");
 
-            if (schedule == null) return false;
+                _context.Schedules.Remove(schedule);
+                await _context.SaveChangesAsync();
 
-            _context.Schedules.Remove(schedule);
-            await _context.SaveChangesAsync();
-
-            return true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting schedule: {ex.Message}", ex);
+            }
         }
     }
 }
