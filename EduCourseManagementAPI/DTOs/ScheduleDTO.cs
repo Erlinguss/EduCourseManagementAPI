@@ -15,6 +15,11 @@ namespace EducationCourseManagement.DTOs
         [Range(1, int.MaxValue, ErrorMessage = "Invalid InstructorId.")]
         public int InstructorId { get; set; }
 
+
+        [Required(ErrorMessage = "RoomId is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid RoomId.")]
+        public int RoomId { get; set; } 
+
         [Required(ErrorMessage = "Date is required.")]
         public DateTime Date { get; set; }
 
