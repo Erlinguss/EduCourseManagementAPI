@@ -8,6 +8,22 @@ DROP TABLE IF EXISTS Schedules;
 DROP TABLE IF EXISTS Students;
 DROP TABLE IF EXISTS Courses;
 DROP TABLE IF EXISTS Instructors;
+DROP TABLE IF EXISTS Rooms;
+
+-- Create Rooms Table
+CREATE TABLE Rooms (
+    RoomId INT PRIMARY KEY AUTO_INCREMENT,
+    RoomName NVARCHAR(100) NOT NULL,
+    Capacity INT NOT NULL
+);
+
+-- Insert Sample Data into Rooms
+INSERT INTO Rooms (RoomName, Capacity) VALUES
+('Room A', 30),
+('Room B', 50),
+('Room C', 25),
+('Room D', 40),
+('Room E', 35);
 
 
 CREATE TABLE Courses (
@@ -66,28 +82,30 @@ INSERT INTO Instructors (Name, Email) VALUES
 ('Dr. Susan Black', 'susan.black@dkit.com');
 
 
+-- Create Schedules Table
 CREATE TABLE Schedules (
     ScheduleId INT PRIMARY KEY AUTO_INCREMENT,
     CourseId INT,
     InstructorId INT,
+    RoomId INT,
     Date DATETIME NOT NULL,
     TimeSlot NVARCHAR(50) NOT NULL,
     FOREIGN KEY (CourseId) REFERENCES Courses(CourseId),
-    FOREIGN KEY (InstructorId) REFERENCES Instructors(InstructorId)
+    FOREIGN KEY (InstructorId) REFERENCES Instructors(InstructorId),
+    FOREIGN KEY (RoomId) REFERENCES Rooms(RoomId)
 );
 
-
-INSERT INTO Schedules (CourseId, InstructorId, Date, TimeSlot) VALUES
-(1, 1, '2024-11-20 09:00:00', '9:00 AM - 10:30 AM'),
-(2, 2, '2024-11-21 11:00:00', '11:00 AM - 12:30 PM'),
-(3, 1, '2024-11-22 10:00:00', '10:00 AM - 11:30 AM'),
-(4, 3, '2024-11-23 09:00:00', '9:00 AM - 10:30 AM'),
-(5, 2, '2024-11-24 11:00:00', '11:00 AM - 12:30 PM'),
-(6, 4, '2024-11-25 13:00:00', '1:00 PM - 2:30 PM'),
-(7, 5, '2024-11-26 14:00:00', '2:00 PM - 3:30 PM'),
-(8, 3, '2024-11-27 10:00:00', '10:00 AM - 11:30 AM'),
-(9, 4, '2024-11-28 09:00:00', '9:00 AM - 10:30 AM'),
-(10, 5, '2024-11-29 13:00:00', '1:00 PM - 2:30 PM');
+INSERT INTO Schedules (CourseId, InstructorId, RoomId, Date, TimeSlot) VALUES
+(1, 1, 1, '2024-11-20 09:00:00', '9:00 AM - 10:30 AM'),
+(2, 2, 2, '2024-11-21 11:00:00', '11:00 AM - 12:30 PM'),
+(3, 1, 3, '2024-11-22 10:00:00', '10:00 AM - 11:30 AM'),
+(4, 3, 4, '2024-11-23 09:00:00', '9:00 AM - 10:30 AM'),
+(5, 2, 5, '2024-11-24 11:00:00', '11:00 AM - 12:30 PM'),
+(6, 4, 1, '2024-11-25 13:00:00', '1:00 PM - 2:30 PM'),
+(7, 5, 2, '2024-11-26 14:00:00', '2:00 PM - 3:30 PM'),
+(8, 3, 3, '2024-11-27 10:00:00', '10:00 AM - 11:30 AM'),
+(9, 4, 4, '2024-11-28 09:00:00', '9:00 AM - 10:30 AM'),
+(10, 5, 5, '2024-11-29 13:00:00', '1:00 PM - 2:30 PM');
 
 
 CREATE TABLE StudentCourses (

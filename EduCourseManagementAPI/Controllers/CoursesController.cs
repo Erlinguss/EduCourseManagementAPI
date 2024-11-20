@@ -41,7 +41,7 @@ namespace EducationCourseManagement.Controllers
 
         // POST: api/Courses
         [HttpPost]
-        [Authorize(Roles = "Admin,Instructor")] 
+        [Authorize(Roles = "Admin")] 
         public async Task<ActionResult<CourseDTO>> PostCourse(CourseDTO courseDTO)
         {
             var createdCourse = await _courseService.CreateCourseAsync(courseDTO);
@@ -50,7 +50,7 @@ namespace EducationCourseManagement.Controllers
 
         // PUT: api/Courses/id
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Instructor")] 
+        [Authorize(Roles = "Admin")] 
         public async Task<IActionResult> PutCourse(int id, CourseDTO courseDTO)
         {
             var updated = await _courseService.UpdateCourseAsync(id, courseDTO);
