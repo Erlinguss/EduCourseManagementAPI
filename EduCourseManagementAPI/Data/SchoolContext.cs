@@ -12,6 +12,7 @@ namespace EducationCourseManagement.Data
         public DbSet<Instructor> Instructors { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<StudentCourse> StudentCourses { get; set; }
+        public DbSet<Room> Rooms { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,6 +21,7 @@ namespace EducationCourseManagement.Data
             modelBuilder.Entity<Instructor>().ToTable("Instructors");
             modelBuilder.Entity<Schedule>().ToTable("Schedules");
             modelBuilder.Entity<StudentCourse>().ToTable("StudentCourses");
+            modelBuilder.Entity<Room>().ToTable("Rooms");
 
             // Configure many-to-many relationship between Students and Courses
             modelBuilder.Entity<StudentCourse>()
