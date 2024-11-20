@@ -7,6 +7,7 @@ namespace EducationCourseManagement.Data
     {
         public SchoolContext(DbContextOptions<SchoolContext> options) : base(options) { }
 
+        public DbSet<User> Users { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Instructor> Instructors { get; set; }
@@ -16,6 +17,7 @@ namespace EducationCourseManagement.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<Course>().ToTable("Courses");
             modelBuilder.Entity<Student>().ToTable("Students");
             modelBuilder.Entity<Instructor>().ToTable("Instructors");

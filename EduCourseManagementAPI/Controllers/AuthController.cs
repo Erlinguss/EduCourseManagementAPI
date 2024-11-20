@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using EducationCourseManagement.Services;
 using EducationCourseManagement.Models;
 
@@ -16,7 +16,7 @@ namespace EducationCourseManagement.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] Login request)
+        public IActionResult Login([FromBody] User request)
         {
             // Mock user validation with role
             if (request.Username == "PeterAdmin" && request.Password == "admindkit" && request.Role == "Admin")
@@ -39,3 +39,49 @@ namespace EducationCourseManagement.Controllers
         }
     }
 }
+*/
+
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using EducationCourseManagement.Services;
+using EducationCourseManagement.Models;
+using EducationCourseManagement.Data;
+using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+
+namespace EducationCourseManagement.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuthController : ControllerBase
+    {
+        private readonly TokenService _tokenService;
+        private readonly SchoolContext _context;
+
+        public AuthController(TokenService tokenService, SchoolContext context)
+        {
+            _tokenService = tokenService;
+            _context = context;
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] Login request)
+        {
+            // Retrieve the user from the database
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+
+            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            {
+                return Unauthorized("Invalid username or password.");
+            }
+
+            // Generate token based on the user's role
+            var token = _tokenService.GenerateToken(user.Role);
+            return Ok(new { Token = token });
+        }
+    }
+}
+
+
+
