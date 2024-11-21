@@ -1,0 +1,1264 @@
+{
+	"info": {
+		"_postman_id": "57c907c8-7f30-486e-b973-f9f6f3f64439",
+		"name": "EduCourseManagementSytem",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "38739685"
+	},
+	"item": [
+		{
+			"name": "Courses Tests",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Define roles and manage current role index\r",
+									"let roles = [\"Admin\", \"Instructor\", \"Student\"];\r",
+									"let currentRoleIndex = pm.environment.get(\"current_role_index\") || 0;\r",
+									"\r",
+									"// Initialize role index if not set\r",
+									"if (!pm.environment.get(\"current_role_index\")) {\r",
+									"    pm.environment.set(\"current_role_index\", 0);\r",
+									"}\r",
+									"\r",
+									"// Get the current role\r",
+									"let currentRole = roles[currentRoleIndex];\r",
+									"pm.environment.set(\"current_role\", currentRole);\r",
+									"\r",
+									"// Generate dynamic data\r",
+									"let timestamp = new Date().getTime();\r",
+									"pm.environment.set(\"dynamicUsername\", `${currentRole}_User_${timestamp}`);\r",
+									"pm.environment.set(\"dynamicPassword\", `Password_${timestamp}`);\r",
+									"pm.environment.set(\"dynamicEmail\", `${currentRole.toLowerCase()}_${timestamp}@example.com`);\r",
+									"pm.environment.set(\"dynamicName\", `${currentRole}_Name_${timestamp}`);\r",
+									"\r",
+									"// Increment role index for the next request\r",
+									"currentRoleIndex = (currentRoleIndex + 1) % roles.length;\r",
+									"pm.environment.set(\"current_role_index\", currentRoleIndex);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response status\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200); \r",
+									"});\r",
+									"\r",
+									"// Parse the response\r",
+									"let responseData;\r",
+									"\r",
+									"try {\r",
+									"    responseData = pm.response.json(); \r",
+									"    console.log(\"Response data:\", responseData); \r",
+									"} catch (e) {\r",
+									"    console.error(\"Failed to parse JSON response:\", e.message);\r",
+									"    return; \r",
+									"}\r",
+									"\r",
+									"// Save the `userId` as a generic environment variable\r",
+									"if (responseData && responseData.userId) {\r",
+									"    pm.environment.set(\"userId\", responseData.userId); \r",
+									"    console.log(\"UserId saved:\", responseData.userId);\r",
+									"} else {\r",
+									"    console.error(\"UserId not found in the response. Ensure the API returns the 'userId' field.\");\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"{{dynamicUsername}}\",\r\n  \"password\": \"{{dynamicPassword}}\",\r\n  \"role\": \"{{current_role}}\",\r\n  \"name\": \"{{dynamicName}}\",\r\n  \"email\": \"{{dynamicEmail}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url }}/Auth/register"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"\r",
+									"// Test the response status\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200); \r",
+									"});\r",
+									"\r",
+									"if (pm.response.code === 200) {\r",
+									"    const token = pm.response.json().token;\r",
+									"    pm.environment.set(\"auth_token\", token);\r",
+									"    console.log(`Token saved`);\r",
+									"} else {\r",
+									"    console.error(`Login failed`);\r",
+									"}\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\r\n{\r\n  \"userId\": \"{{userId}}\",\r\n  \"username\": \"{{dynamicUsername}}\",\r\n  \"password\": \"{{dynamicPassword}}\",\r\n  \"role\": \"{{current_role}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url }}/Auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Course By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Fixed syntax \r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{url }}/Courses/1"
+					},
+					"response": []
+				},
+				{
+					"name": "GET all Courses",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains a list of courses\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.be.an(\"array\").that.is.not.empty;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{url }}/Courses"
+					},
+					"response": []
+				},
+				{
+					"name": "Add New Course",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {\r",
+									"    pm.test(\"Status code is 201 Created\", function () {\r",
+									"        pm.response.to.have.status(201);\r",
+									"    });\r",
+									"\r",
+									"    // Parse the JSON response (if applicable)\r",
+									"    let responseData = pm.response.json();\r",
+									"\r",
+									"    if (responseData && responseData.courseId) {\r",
+									"        pm.environment.set(\"courseId\", responseData.courseId);\r",
+									"        console.log(\"Course created with ID:\", responseData.courseId);\r",
+									"    } else {\r",
+									"        console.warn(\"courseId not found in the response.\");\r",
+									"    }\r",
+									"} else if (pm.response.code === 204) {\r",
+									"    pm.test(\"Status code is 204 No Content\", function () {\r",
+									"        pm.response.to.have.status(204);\r",
+									"    });\r",
+									"\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([201, 204, 403]);\r",
+									"    });\r",
+									"\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Service Oriented Architecture\",\r\n  \"description\": \"Microservices CRUD\",\r\n  \"credits\": 4\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url }}/Courses"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Course",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"if (pm.response.code === 204) {\r",
+									"    pm.test(\"Status code is 204 No Content\", function () {\r",
+									"        pm.response.to.have.status(204);\r",
+									"    });\r",
+									"\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([204, 403]);\r",
+									"    });\r",
+									"\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"courseId\": {{courseId}},\r\n  \"title\": \"Data Science\",\r\n  \"description\": \"Prediction modules\",\r\n  \"credits\": 8\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url }}/Courses/{{courseId}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Course",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Get the current role being tested\r",
+									"let currentRole = pm.environment.get(\"current_role\");\r",
+									"\r",
+									"// Log the current role\r",
+									"console.log(`Testing role: ${currentRole}`);\r",
+									"\r",
+									"// Conditional handling for expected status codes\r",
+									"if (pm.response.code === 204) {\r",
+									"    pm.test(`${currentRole}: Status code is 204 (No Content)`, function () {\r",
+									"        pm.response.to.have.status(204);\r",
+									"    });\r",
+									"    console.log(`${currentRole}: Passed with 204 No Content.`);\r",
+									"} else if (pm.response.code === 403) {\r",
+									" \r",
+									"    pm.test(`${currentRole}: Status code is 403 Forbidden`, function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    // Fallback for unexpected status codes\r",
+									"    pm.test(`${currentRole}: Unexpected status code`, function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([204, 403]);\r",
+									"    });\r",
+									"    console.warn(`${currentRole}: Received unexpected status code ${pm.response.code}.`);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{url }}/Courses/{{courseId}}"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Students Tests",
+			"item": [
+				{
+					"name": "Get all Students",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"if (pm.response.code === 200) {\r",
+									"    pm.test(\"Response status code is 200 OK\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Response contains a list of courses\", function () {\r",
+									"        const jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData).to.be.an(\"array\").that.is.not.empty;\r",
+									"    });\r",
+									"\r",
+									"    console.log(\"Successfully retrieved a list of courses.\");\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"    console.warn(\"Access forbidden: User lacks the required permissions.\");\r",
+									"} else {\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([200, 403]);\r",
+									"    });\r",
+									"\r",
+									"    console.error(\"Unexpected status code encountered:\", pm.response.code);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{url }}/Students"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test to check the response content type\r",
+									"pm.test(\"Response content type is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"// Generate a unique timestamp\r",
+									"const timestamp = new Date().getTime();\r",
+									"\r",
+									"// Generate a random full name with a timestamp\r",
+									"const fullName = `Peter${timestamp}`;\r",
+									"pm.environment.set(\"uniqueFullName\", fullName);\r",
+									"\r",
+									"// Generate a random email address with a timestamp\r",
+									"const email = `Peter${timestamp}@example.com`;\r",
+									"pm.environment.set(\"uniqueEmail\", email);\r",
+									"\r",
+									"// Log the values for debugging\r",
+									"console.log(\"Generated Full Name:\", fullName);\r",
+									"console.log(\"Generated Email:\", email);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{url }}/Students/3"
+					},
+					"response": []
+				},
+				{
+					"name": "Add New student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {\r",
+									"    // Test for 201 Created\r",
+									"    pm.test(\"Status code is 201 Created\", function () {\r",
+									"        pm.response.to.have.status(201);\r",
+									"    });\r",
+									"\r",
+									"    // Parse the JSON response\r",
+									"    let responseData = pm.response.json();\r",
+									"\r",
+									"    // Save the `studentId` from the response into an environment variable\r",
+									"    if (responseData && responseData.studentId) {\r",
+									"        pm.environment.set(\"studentId\", responseData.studentId);\r",
+									"        console.log(\"Saved studentId:\", responseData.studentId);\r",
+									"    } else {\r",
+									"        console.warn(\"studentId not found in the response.\");\r",
+									"    }\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    // Test for 403 Forbidden\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    // Handle unexpected status codes\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([201, 403]);\r",
+									"    });\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"{{uniqueFullName}}\",\r\n  \"email\": \"{{uniqueEmail}}\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url }}/Students?userId={{userId}}",
+							"host": [
+								"{{url }}"
+							],
+							"path": [
+								"Students"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{userId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"if (pm.response.code === 204) {\r",
+									"    // Test for 204 No Content\r",
+									"    pm.test(\"Status code is 204 No Content\", function () {\r",
+									"        pm.response.to.have.status(204);\r",
+									"    });\r",
+									"\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    // Test for 403 Forbidden\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    // Handle unexpected status codes\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([204, 403]);\r",
+									"    });\r",
+									"\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"studentId\":{{studentId}} ,\r\n  \"name\": \"{{uniqueFullName}} New\",\r\n  \"email\": \"{{uniqueEmail}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url }}/Students/{{studentId}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 204) {\r",
+									"    // Test for 204 No Content\r",
+									"    pm.test(\"Status code is 204 No Content\", function () {\r",
+									"        pm.response.to.have.status(204);\r",
+									"    });\r",
+									"\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    // Test for 403 Forbidden\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    // Handle unexpected status codes\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([204, 403]);\r",
+									"    });\r",
+									"\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{url }}/Students/{{studentId}}"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Instructors Tests",
+			"item": [
+				{
+					"name": "Get All Instructors",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {\r",
+									"    pm.test(\"Response status code is 200 OK\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Response contains a list of courses\", function () {\r",
+									"        const jsonData = pm.response.json();\r",
+									"        pm.expect(jsonData).to.be.an(\"array\").that.is.not.empty;\r",
+									"    });\r",
+									"\r",
+									"    console.log(\"Successfully retrieved a list of courses.\");\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([200, 403]);\r",
+									"    });\r",
+									"\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{url }}/Instructors"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Instructor By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {\r",
+									"    pm.test(\"Response content type is application/json\", function () {\r",
+									"        pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+									"    });\r",
+									"\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([200, 403]);\r",
+									"    });\r",
+									"\r",
+									"}\r",
+									"\r",
+									"// Generate a unique timestamp\r",
+									"const timestamp = new Date().getTime();\r",
+									"\r",
+									"// Generate a random full Instructor name with a timestamp\r",
+									"const instructorFullName = `Dr. ${timestamp}`;\r",
+									"pm.environment.set(\"instructorName\", instructorFullName);\r",
+									"\r",
+									"// Generate a Instructor random email address with a timestamp\r",
+									"const instructorEmail = `dr${timestamp}@dkit.com`;\r",
+									"pm.environment.set(\"instructorEmail\", instructorEmail);\r",
+									"\r",
+									"// Log the values for debugging\r",
+									"console.log(\"Generated Full Name:\", instructorFullName);\r",
+									"console.log(\"Generated Email:\", instructorEmail);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{url }}/Instructors/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Add New Instructor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {\r",
+									"    // Test for 201 Created\r",
+									"    pm.test(\"Status code is 201 Created\", function () {\r",
+									"        pm.response.to.have.status(201);\r",
+									"    });\r",
+									"\r",
+									"    // Parse the JSON response (if applicable)\r",
+									"    let responseData = pm.response.json();\r",
+									"\r",
+									"    // Save the `instructorId` from the response into an environment variable\r",
+									"    if (responseData && responseData.instructorId) {\r",
+									"        pm.environment.set(\"instructorId\", responseData.instructorId);\r",
+									"        console.log(\"Saved instructorId:\", responseData.instructorId);\r",
+									"    } else {\r",
+									"        console.warn(\"instructorId not found in the response.\");\r",
+									"    }\r",
+									"    \r",
+									"} else if (pm.response.code === 403) {\r",
+									"    // Test for 403 Forbidden\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    // Handle unexpected status codes\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([201, 403]);\r",
+									"    });\r",
+									"\r",
+									"}\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"name\": \"{{instructorName}}\",\r\n   \"email\": \"{{instructorEmail}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url }}/Instructors?userId={{userId}}",
+							"host": [
+								"{{url }}"
+							],
+							"path": [
+								"Instructors"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{userId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Instructor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 204) {\r",
+									"    // Test for 204 No Content\r",
+									"    pm.test(\"Status code is 204 No Content\", function () {\r",
+									"        pm.response.to.have.status(204);\r",
+									"    });\r",
+									"\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    // Test for 403 Forbidden\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    // Handle unexpected status codes\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([204, 403]);\r",
+									"    });\r",
+									"\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"instructorId\":{{instructorId}} ,\r\n   \"name\": \"{{instructorName}} Parrell\",\r\n   \"email\": \"{{instructorEmail}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url }}/Instructors/{{instructorId}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Instructor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 204) {\r",
+									"    // Test for 204 No Content\r",
+									"    pm.test(\"Status code is 204 No Content\", function () {\r",
+									"        pm.response.to.have.status(204);\r",
+									"    });\r",
+									"\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    // Test for 403 Forbidden\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    // Handle unexpected status codes\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([204, 403]);\r",
+									"    });\r",
+									"\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{url }}/Instructors/{{instructorId}}"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Schedules Tests",
+			"item": [
+				{
+					"name": "Get all Schedules",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Fixed syntax \r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{url }}/Schedules"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Schedule By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test to check the response content type\r",
+									"pm.test(\"Response content type is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{url }}/Schedules/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Add New Schedule",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"if (pm.response.code === 201) {\r",
+									"    pm.test(\"Status code is 201 Created\", function () {\r",
+									"        pm.response.to.have.status(201);\r",
+									"    });\r",
+									"\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([201, 403]);\r",
+									"    });\r",
+									"\r",
+									"}\r",
+									"\r",
+									"\r",
+									"let responseData = pm.response.json();\r",
+									"pm.environment.set(\"scheduleId\", responseData.scheduleId);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n\"courseId\": 1, \r\n\"instructorId\": 1, \r\n\"date\": \"2024-11-30T09:00:00\", \r\n\"roomId\":1,\r\n\"timeSlot\": \"9:00 AM - 10:30 AM\" \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url }}/Schedules"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Schedule",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 204) {\r",
+									"    pm.test(\"Status code is 204 No Content\", function () {\r",
+									"        pm.response.to.have.status(204);\r",
+									"    });\r",
+									"\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([204, 403]);\r",
+									"    });\r",
+									"\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\r\n\r\n{\r\n  \"scheduleId\": {{scheduleId}},\r\n  \"courseId\": 1,\r\n  \"instructorId\": 1,\r\n  \"roomId\": 1,\r\n  \"date\": \"2024-11-18T15:10:16.294Z\",\r\n  \"timeSlot\": \"11:00 AM - 12:30 AM\" \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url }}/Schedules/{{scheduleId}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Schedule",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 204) {\r",
+									"    // Test for 204 No Content\r",
+									"    pm.test(\"Status code is 204 No Content\", function () {\r",
+									"        pm.response.to.have.status(204);\r",
+									"    });\r",
+									"\r",
+									"} else if (pm.response.code === 403) {\r",
+									"    // Test for 403 Forbidden\r",
+									"    pm.test(\"Status code is 403 Forbidden\", function () {\r",
+									"        pm.response.to.have.status(403);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    // Handle unexpected status codes\r",
+									"    pm.test(\"Unexpected status code\", function () {\r",
+									"        pm.expect(pm.response.code).to.be.oneOf([204, 403]);\r",
+									"    });\r",
+									"\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url }}/Schedules/{{scheduleId}}"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url ",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

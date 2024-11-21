@@ -52,8 +52,8 @@ namespace EducationCourseManagement.Services
             if (user == null)
                 throw new ArgumentException($"User with ID {userId} does not exist.");
 
-            if (user.Role != "Student")
-                throw new ArgumentException($"User with ID {userId} does not have the 'Student' role.");
+            if (user.Role != "Admin")
+                throw new ArgumentException($"User with ID {userId} does not have the 'Admin' role.");
 
             if (await _context.Students.AnyAsync(s => s.Email == studentDTO.Email))
                 throw new InvalidOperationException($"A student with email {studentDTO.Email} already exists.");
