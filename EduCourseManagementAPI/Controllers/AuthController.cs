@@ -41,12 +41,13 @@ namespace EducationCourseManagement.Controllers
 }
 */
 
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EducationCourseManagement.Services;
 using EducationCourseManagement.Models;
 using EducationCourseManagement.Data;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.Data;
 
 namespace EducationCourseManagement.Controllers
 {
@@ -63,13 +64,14 @@ namespace EducationCourseManagement.Controllers
             _context = context;
         }
 
+        // Login Method
         [HttpPost("login")]
-        public async Task<IActionResult> Login ([FromBody] User request)
+        public async Task<IActionResult> Login([FromBody] User request)
         {
             // Retrieve the user from the database
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
 
-            if (user == null || user.Password != request.Password) 
+            if (user == null || user.Password != request.Password)
             {
                 return Unauthorized("Invalid username or password.");
             }
@@ -79,8 +81,63 @@ namespace EducationCourseManagement.Controllers
             return Ok(new { Token = token });
         }
 
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] Register request)
+        {
+            // Check if the username already exists
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+            if (existingUser != null)
+            {
+                return BadRequest("Username already exists.");
+            }
+
+            // Create a new User
+            var newUser = new User
+            {
+                Username = request.Username,
+                Password = request.Password,
+                Role = request.Role
+            };
+
+            await _context.Users.AddAsync(newUser);
+            await _context.SaveChangesAsync();
+
+            // Insert into Students or Instructors based on Role
+            if (request.Role == "Student")
+            {
+                var newStudent = new Student
+                {
+                    UserId = newUser.UserId, 
+                    Name = request.Name,
+                    Email = request.Email
+                };
+
+                await _context.Students.AddAsync(newStudent);
+            }
+            else if (request.Role == "Instructor")
+            {
+                var newInstructor = new Instructor
+                {
+                    UserId = newUser.UserId, 
+                    Name = request.Name,
+                    Email = request.Email
+                };
+
+                await _context.Instructors.AddAsync(newInstructor);
+            }
+            else
+            {
+                return BadRequest("Invalid role specified. Role must be 'Student' or 'Instructor'.");
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok("User registered successfully.");
+        }
+
     }
 }
+
 
 
 
