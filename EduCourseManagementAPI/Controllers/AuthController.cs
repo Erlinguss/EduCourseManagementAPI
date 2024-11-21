@@ -22,7 +22,6 @@ namespace EducationCourseManagement.Controllers
             _context = context;
         }
 
-        // Login Method
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] User request)
         {
@@ -38,70 +37,8 @@ namespace EducationCourseManagement.Controllers
             var token = _tokenService.GenerateToken(user.Role);
             return Ok(new { Token = token });
         }
-        /*
-                [HttpPost("register")]
-                public async Task<IActionResult> Register([FromBody] Register request)
-                {
-                    // Check if the username already exists
-                    var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
-                    if (existingUser != null)
-                    {
-                        return BadRequest("Username already exists.");
-                    }
-
-                    // Create a new User
-                    var newUser = new User
-                    {
-                        Username = request.Username,
-                        Password = request.Password,
-                        Role = request.Role
-                    };
-
-                    await _context.Users.AddAsync(newUser);
-                    await _context.SaveChangesAsync();
-
-                    // Insert into Students or Instructors based on Role
-                    if (request.Role == "Student")
-                    {
-                        var newStudent = new Student
-                        {
-                            UserId = newUser.UserId,
-                            Name = request.Name,
-                            Email = request.Email
-                        };
-
-                        await _context.Students.AddAsync(newStudent);
-                    }
-                    else if (request.Role == "Instructor")
-                    {
-                        var newInstructor = new Instructor
-                        {
-                            UserId = newUser.UserId,
-                            Name = request.Name,
-                            Email = request.Email
-                        };
-
-                        await _context.Instructors.AddAsync(newInstructor);
-                    }
-                    else
-                    {
-                        return BadRequest("Invalid role specified. Role must be 'Student' or 'Instructor'.");
-                    }
-
-                    await _context.SaveChangesAsync();
-
-                    // Return the userId in the response
-                    return Ok(new
-                    {
-                        message = "User registered successfully.",
-                        userId = newUser.UserId
-                    });
-                }
-
-            }*/
 
         [HttpPost("register")]
-        [Authorize(Roles = "Admin")] // Only existing Admins can create new Admins
         public async Task<IActionResult> Register([FromBody] Register request)
         {
             // Check if the username already exists
@@ -112,10 +49,11 @@ namespace EducationCourseManagement.Controllers
             }
 
             // Validate role
-            if (request.Role != "Admin" && request.Role != "Instructor" && request.Role != "Student")
+            if (!new[] { "Admin", "Instructor", "Student" }.Contains(request.Role))
             {
-                return BadRequest("Invalid role specified. Role must be 'Admin', 'Instructor', or 'Student'.");
+                return BadRequest(new { Message = "Invalid role specified. Role must be 'Admin', 'Instructor', or 'Student'." });
             }
+
 
             // Create a new User
             var newUser = new User
@@ -130,8 +68,20 @@ namespace EducationCourseManagement.Controllers
 
             if (request.Role == "Admin")
             {
-                // No additional table for admin; return success directly
                 return Ok(new { UserId = newUser.UserId, Message = "Admin registered successfully." });
+            }
+
+            // Insert into Students or Instructors based on Role
+            if (request.Role == "Student")
+            {
+                var newStudent = new Student
+                {
+                    UserId = newUser.UserId,
+                    Name = request.Name,
+                    Email = request.Email
+                };
+
+                await _context.Students.AddAsync(newStudent);
             }
             else if (request.Role == "Instructor")
             {
@@ -144,24 +94,24 @@ namespace EducationCourseManagement.Controllers
 
                 await _context.Instructors.AddAsync(newInstructor);
             }
-            else if (request.Role == "Student")
+            else
             {
-                var newStudent = new Student
-                {
-                    UserId = newUser.UserId,
-                    Name = request.Name,
-                    Email = request.Email
-                };
-
-                await _context.Students.AddAsync(newStudent);
+                return BadRequest("Invalid role specified. Role must be 'Student' or 'Instructor'.");
             }
 
             await _context.SaveChangesAsync();
 
-            return Ok(new { UserId = newUser.UserId, Message = $"{request.Role} registered successfully." });
+            // Return the userId in the response
+            return Ok(new
+            {
+                message = "User registered successfully.",
+                userId = newUser.UserId
+            });
         }
+
     }
 }
+
 
 
 
