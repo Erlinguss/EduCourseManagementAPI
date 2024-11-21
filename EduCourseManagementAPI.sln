@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EduCourseManagementAPI", "EduCourseManagementAPI\EduCourseManagementAPI.csproj", "{C1F1B509-E431-41E5-8D83-A7BAD07CD356}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestEduCourseManagement", "TestEduCourseManagement\TestEduCourseManagement.csproj", "{5569AB49-96FB-43D1-B62C-933245F7D232}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EduCourseManagementTest", "TestEduCourseManagement\EduCourseManagementTest.csproj", "{5569AB49-96FB-43D1-B62C-933245F7D232}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
