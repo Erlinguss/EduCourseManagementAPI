@@ -1,5 +1,6 @@
 ﻿using EducationCourseManagement.Data;
 using EducationCourseManagement.DTOs;
+using EducationCourseManagement.Models;
 using EduCourseManagementAPI.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +17,9 @@ namespace EducationCourseManagement.Services
 
         public async Task<IEnumerable<InstructorDTO>> GetAllInstructorsAsync()
         {
-            var instructors = await _context.Instructors.ToListAsync();
+            var instructors = await _context.Instructors
+                .Include(i => i.User) 
+                .ToListAsync();
 
             return instructors.Select(i => new InstructorDTO
             {
@@ -28,7 +31,9 @@ namespace EducationCourseManagement.Services
 
         public async Task<InstructorDTO> GetInstructorByIdAsync(int id)
         {
-            var instructor = await _context.Instructors.FindAsync(id);
+            var instructor = await _context.Instructors
+                .Include(i => i.User) 
+                .FirstOrDefaultAsync(i => i.InstructorId == id);
 
             if (instructor == null)
                 return null;
@@ -41,19 +46,21 @@ namespace EducationCourseManagement.Services
             };
         }
 
-        public async Task<InstructorDTO> CreateInstructorAsync(InstructorDTO instructorDTO)
+        public async Task<InstructorDTO> CreateInstructorWithUserAsync(int userId, InstructorDTO instructorDTO)
         {
-            if (string.IsNullOrWhiteSpace(instructorDTO.Name))
-                throw new ArgumentException("Name is required.");
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                throw new ArgumentException($"User with ID {userId} does not exist.");
 
-            if (string.IsNullOrWhiteSpace(instructorDTO.Email))
-                throw new ArgumentException("Email is required.");
+            if (user.Role != "Instructor")
+                throw new ArgumentException($"User with ID {userId} does not have the 'Instructor' role.");
 
             if (await _context.Instructors.AnyAsync(i => i.Email == instructorDTO.Email))
-                throw new InvalidOperationException("An instructor with this email already exists.");
+                throw new InvalidOperationException($"An instructor with email {instructorDTO.Email} already exists.");
 
             var instructor = new Instructor
             {
+                UserId = userId,
                 Name = instructorDTO.Name,
                 Email = instructorDTO.Email
             };
@@ -68,8 +75,8 @@ namespace EducationCourseManagement.Services
         public async Task<bool> UpdateInstructorAsync(int id, InstructorDTO instructorDTO)
         {
             var instructor = await _context.Instructors.FindAsync(id);
-
-            if (instructor == null) return false;
+            if (instructor == null)
+                return false;
 
             instructor.Name = instructorDTO.Name;
             instructor.Email = instructorDTO.Email;
@@ -83,8 +90,7 @@ namespace EducationCourseManagement.Services
         public async Task<bool> DeleteInstructorAsync(int id)
         {
             var instructor = await _context.Instructors.FindAsync(id);
-
-            if (instructor == null) 
+            if (instructor == null)
                 return false;
 
             _context.Instructors.Remove(instructor);

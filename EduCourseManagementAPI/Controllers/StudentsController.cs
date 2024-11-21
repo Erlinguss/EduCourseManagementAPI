@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using EducationCourseManagement.DTOs;
 using EduCourseManagementAPI.Interfaces;
+using EducationCourseManagement.DTOs;
 
 namespace EducationCourseManagement.Controllers
 {
@@ -19,16 +19,16 @@ namespace EducationCourseManagement.Controllers
 
         // GET: api/Students
         [HttpGet]
-        [Authorize(Roles = "Admin,Instructor")] 
+        [Authorize(Roles = "Admin,Instructor")]
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudents()
         {
             var students = await _studentService.GetAllStudentsAsync();
             return Ok(students);
         }
 
-        // GET: api/Students/id
+        // GET: api/Students/{id}
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Student,Instructor")] 
+        [Authorize(Roles = "Admin,Student,Instructor")]
         public async Task<ActionResult<StudentDTO>> GetStudent(int id)
         {
             var student = await _studentService.GetStudentByIdAsync(id);
@@ -39,19 +39,30 @@ namespace EducationCourseManagement.Controllers
             return Ok(student);
         }
 
-        // POST: api/Students
+        // POST: api/Students?userId=
         [HttpPost]
-        [Authorize(Roles = "Admin")] 
-        public async Task<ActionResult<StudentDTO>> PostStudent(StudentDTO studentDTO)
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<StudentDTO>> PostStudentWithUser(int userId, [FromBody] StudentDTO studentDTO)
         {
-            var createdStudent = await _studentService.CreateStudentAsync(studentDTO);
-            return CreatedAtAction(nameof(GetStudent), new { id = createdStudent.StudentId }, createdStudent);
+            try
+            {
+                var createdStudent = await _studentService.CreateStudentWithUserAsync(userId, studentDTO);
+                return CreatedAtAction(nameof(GetStudent), new { id = createdStudent.StudentId }, createdStudent);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
-        // PUT: api/Students/id
+        // PUT: api/Students/{id}
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")] 
-        public async Task<IActionResult> PutStudent(int id, StudentDTO studentDTO)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> PutStudent(int id, [FromBody] StudentDTO studentDTO)
         {
             var updated = await _studentService.UpdateStudentAsync(id, studentDTO);
             if (!updated)
@@ -60,12 +71,13 @@ namespace EducationCourseManagement.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Students/id
+        // DELETE: api/Students/{id}
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteStudent(int id)
         {
             var deleted = await _studentService.DeleteStudentAsync(id);
+
             if (!deleted)
                 return NotFound();
 
