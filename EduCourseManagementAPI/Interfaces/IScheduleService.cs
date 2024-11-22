@@ -9,5 +9,10 @@ namespace EduCourseManagementAPI.Interfaces
         Task<ScheduleDTO> CreateScheduleAsync(ScheduleDTO scheduleDTO);
         Task<bool> UpdateScheduleAsync(int id, ScheduleDTO scheduleDTO);
         Task<bool> DeleteScheduleAsync(int id);
+
+
+        Task<bool> GenerateSchedulesForDayAsync(DateTime date);
+        Task<List<string>> ValidateScheduleConflictsAsync();
+
     }
 }
