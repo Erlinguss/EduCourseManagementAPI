@@ -13,11 +13,6 @@ namespace EduCourseManagementAPI.Interfaces
 
 
         Task<bool> GenerateSchedulesForDayAsync(DateTime date);
-        Task<ScheduleDTO> ValidatedScheduleAsync();
-
-       /* Task<ScheduleDTO> ValidatedScheduleAsync(int courseId, int instructorId, int roomId, DateTime date, string timeSlot);
-      */
-
+        Task<ScheduleDTO> ValidatedScheduleAsync(int courseId, int instructorId, int roomId, DateTime date, string timeSlot);
     }
-
 }

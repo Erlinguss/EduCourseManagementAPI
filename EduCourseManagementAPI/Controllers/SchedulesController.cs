@@ -7,7 +7,7 @@ namespace EducationCourseManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] 
+    [Authorize]
     public class SchedulesController : ControllerBase
     {
         private readonly IScheduleService _scheduleService;
@@ -19,7 +19,7 @@ namespace EducationCourseManagement.Controllers
 
         // GET: api/Schedules
         [HttpGet]
-        [Authorize(Roles = "Admin,Instructor,Student")] 
+        [Authorize(Roles = "Admin,Instructor,Student")]
         public async Task<ActionResult<IEnumerable<ScheduleDTO>>> GetSchedules()
         {
             var schedules = await _scheduleService.GetAllSchedulesAsync();
@@ -28,7 +28,7 @@ namespace EducationCourseManagement.Controllers
 
         // GET: api/Schedules/id
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Instructor,Student")] 
+        [Authorize(Roles = "Admin,Instructor,Student")]
         public async Task<ActionResult<ScheduleDTO>> GetSchedule(int id)
         {
             var schedule = await _scheduleService.GetScheduleByIdAsync(id);
@@ -40,7 +40,7 @@ namespace EducationCourseManagement.Controllers
 
         // POST: api/Schedules
         [HttpPost]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ScheduleDTO>> PostSchedule(ScheduleDTO scheduleDTO)
         {
             var createdSchedule = await _scheduleService.CreateScheduleAsync(scheduleDTO);
@@ -49,7 +49,7 @@ namespace EducationCourseManagement.Controllers
 
         // PUT: api/Schedules/id
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutSchedule(int id, ScheduleDTO scheduleDTO)
         {
             var updated = await _scheduleService.UpdateScheduleAsync(id, scheduleDTO);
@@ -70,5 +70,19 @@ namespace EducationCourseManagement.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("generate")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GenerateSchedules([FromQuery] DateTime date)
+        {
+            if (date == default)
+                return BadRequest("Invalid date provided.");
+
+            var success = await _scheduleService.GenerateSchedulesForDayAsync(date);
+            if (success)
+                return Ok($"Schedules successfully generated for {date:yyyy-MM-dd}.");
+            return StatusCode(500, "Failed to generate schedules.");
+        }
+
     }
 }
