@@ -4,6 +4,7 @@ using EducationCourseManagement.Models;
 using EduCourseManagementAPI.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace EducationCourseManagement.Services
 {
     public class ScheduleService : IScheduleService
@@ -69,45 +70,68 @@ namespace EducationCourseManagement.Services
                 throw new Exception($"Error fetching schedule by ID: {ex.Message}", ex);
             }
         }
+        /*
+                public async Task<ScheduleDTO> CreateScheduleAsync(ScheduleDTO scheduleDTO)
+                {
+                    try
+                    {
+                        // Validate room availability
+                        var isRoomAvailable = await _context.Schedules.AnyAsync(s =>
+                            s.RoomId == scheduleDTO.RoomId &&
+                            s.Date.Date == scheduleDTO.Date.Date &&
+                            s.TimeSlot == scheduleDTO.TimeSlot);
+                        if (isRoomAvailable)
+                            throw new InvalidOperationException("The room is already booked for the specified time slot.");
+
+                        // Validate instructor availability
+                        var isInstructorAvailable = await _context.Schedules.AnyAsync(s =>
+                            s.InstructorId == scheduleDTO.InstructorId &&
+                            s.Date.Date == scheduleDTO.Date.Date &&
+                            s.TimeSlot == scheduleDTO.TimeSlot);
+                        if (isInstructorAvailable)
+                            throw new InvalidOperationException("The instructor is already booked for the specified time slot.");
+
+                        // Validate course availability
+                        var isCourseAvailable = await _context.Schedules.AnyAsync(s =>
+                            s.CourseId == scheduleDTO.CourseId &&
+                            s.Date.Date == scheduleDTO.Date.Date &&
+                            s.TimeSlot == scheduleDTO.TimeSlot);
+                        if (isCourseAvailable)
+                            throw new InvalidOperationException("The course is already scheduled for the specified time slot.");
+
+                        var schedule = new Schedule
+                        {
+                            CourseId = scheduleDTO.CourseId,
+                            InstructorId = scheduleDTO.InstructorId,
+                            RoomId = scheduleDTO.RoomId,
+                            Date = scheduleDTO.Date,
+                            TimeSlot = scheduleDTO.TimeSlot
+                        };
+
+                        _context.Schedules.Add(schedule);
+                        await _context.SaveChangesAsync();
+
+                        scheduleDTO.ScheduleId = schedule.ScheduleId;
+                        return scheduleDTO;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"Error creating schedule: {ex.Message}", ex);
+                    }
+                }*/
 
         public async Task<ScheduleDTO> CreateScheduleAsync(ScheduleDTO scheduleDTO)
         {
             try
             {
-                // Validate room availability
-                var isRoomAvailable = await _context.Schedules.AnyAsync(s =>
-                    s.RoomId == scheduleDTO.RoomId &&
-                    s.Date.Date == scheduleDTO.Date.Date &&
-                    s.TimeSlot == scheduleDTO.TimeSlot);
-                if (isRoomAvailable)
-                    throw new InvalidOperationException("The room is already booked for the specified time slot.");
+                var schedule = await ValidatedScheduleAsync(
+                    scheduleDTO.CourseId,
+                    scheduleDTO.InstructorId,
+                    scheduleDTO.RoomId,
+                    scheduleDTO.Date,
+                    scheduleDTO.TimeSlot
+                );
 
-                // Validate instructor availability
-                var isInstructorAvailable = await _context.Schedules.AnyAsync(s =>
-                    s.InstructorId == scheduleDTO.InstructorId &&
-                    s.Date.Date == scheduleDTO.Date.Date &&
-                    s.TimeSlot == scheduleDTO.TimeSlot);
-                if (isInstructorAvailable)
-                    throw new InvalidOperationException("The instructor is already booked for the specified time slot.");
-
-                // Validate course availability
-                var isCourseAvailable = await _context.Schedules.AnyAsync(s =>
-                    s.CourseId == scheduleDTO.CourseId &&
-                    s.Date.Date == scheduleDTO.Date.Date &&
-                    s.TimeSlot == scheduleDTO.TimeSlot);
-                if (isCourseAvailable)
-                    throw new InvalidOperationException("The course is already scheduled for the specified time slot.");
-
-                var schedule = new Schedule
-                {
-                    CourseId = scheduleDTO.CourseId,
-                    InstructorId = scheduleDTO.InstructorId,
-                    RoomId = scheduleDTO.RoomId,
-                    Date = scheduleDTO.Date,
-                    TimeSlot = scheduleDTO.TimeSlot
-                };
-
-                _context.Schedules.Add(schedule);
                 await _context.SaveChangesAsync();
 
                 scheduleDTO.ScheduleId = schedule.ScheduleId;
@@ -118,6 +142,7 @@ namespace EducationCourseManagement.Services
                 throw new Exception($"Error creating schedule: {ex.Message}", ex);
             }
         }
+
 
         public async Task<bool> UpdateScheduleAsync(int id, ScheduleDTO scheduleDTO)
         {
@@ -190,12 +215,13 @@ namespace EducationCourseManagement.Services
             }
         }
 
+
         private readonly List<string> _timeSlots = new()
         {
             "9:00 AM - 10:30 AM", "10:30 AM - 12:00 PM", "1:00 PM - 2:30 PM","2:30 PM - 4:00 PM"
         };
 
-        private async Task<Schedule> CreateValidatedScheduleAsync(int courseId, int instructorId, int roomId, DateTime date, string timeSlot)
+        private async Task<Schedule> ValidatedScheduleAsync(int courseId, int instructorId, int roomId, DateTime date, string timeSlot)
         {
             try
             {
@@ -244,6 +270,53 @@ namespace EducationCourseManagement.Services
             {
                 throw new Exception($"An error occurred while creating the schedule: {ex.Message}", ex);
             }
+        }
+
+        public async Task<bool> GenerateSchedulesForDayAsync(DateTime date)
+        {
+            var courses = await _context.Courses.ToListAsync();
+            var instructors = await _context.Instructors.ToListAsync();
+            var rooms = await _context.Rooms.ToListAsync();
+
+            foreach (var course in courses)
+            {
+                foreach (var timeSlot in _timeSlots)
+                {
+                    // Find available instructor and room
+                    var availableInstructor = instructors.FirstOrDefault(i =>
+                        !_context.Schedules.Any(s =>
+                            s.InstructorId == i.InstructorId &&
+                            s.Date.Date == date.Date &&
+                            s.TimeSlot == timeSlot));
+
+                    var availableRoom = rooms.FirstOrDefault(r =>
+                        !_context.Schedules.Any(s =>
+                            s.RoomId == r.RoomId &&
+                            s.Date.Date == date.Date &&
+                            s.TimeSlot == timeSlot));
+
+                    if (availableInstructor != null && availableRoom != null)
+                    {
+                        try
+                        {
+                            await ValidatedScheduleAsync(
+                                course.CourseId,
+                                availableInstructor.InstructorId,
+                                availableRoom.RoomId,
+                                date,
+                                timeSlot
+                            );
+                        }
+                        catch
+                        {
+                            // Skip conflicting schedules
+                        }
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
         }
 
 

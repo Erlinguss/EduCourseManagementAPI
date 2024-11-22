@@ -1,4 +1,5 @@
 ﻿using EducationCourseManagement.DTOs;
+using EducationCourseManagement.Models;
 
 namespace EduCourseManagementAPI.Interfaces
 {
@@ -12,7 +13,11 @@ namespace EduCourseManagementAPI.Interfaces
 
 
         Task<bool> GenerateSchedulesForDayAsync(DateTime date);
-        Task<List<string>> ValidateScheduleConflictsAsync();
+        Task<ScheduleDTO> ValidatedScheduleAsync();
+
+       /* Task<ScheduleDTO> ValidatedScheduleAsync(int courseId, int instructorId, int roomId, DateTime date, string timeSlot);
+      */
 
     }
+
 }

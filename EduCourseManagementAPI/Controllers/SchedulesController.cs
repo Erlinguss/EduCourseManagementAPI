@@ -61,7 +61,7 @@ namespace EducationCourseManagement.Controllers
 
         // DELETE: api/Schedules/id
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteSchedule(int id)
         {
             var deleted = await _scheduleService.DeleteScheduleAsync(id);
