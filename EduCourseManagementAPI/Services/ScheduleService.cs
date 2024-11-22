@@ -189,5 +189,63 @@ namespace EducationCourseManagement.Services
                 throw new Exception($"Error deleting schedule: {ex.Message}", ex);
             }
         }
+
+        private readonly List<string> _timeSlots = new()
+        {
+            "9:00 AM - 10:30 AM", "10:30 AM - 12:00 PM", "1:00 PM - 2:30 PM","2:30 PM - 4:00 PM"
+        };
+
+        private async Task<Schedule> CreateValidatedScheduleAsync(int courseId, int instructorId, int roomId, DateTime date, string timeSlot)
+        {
+            try
+            {
+                // Validate room availability
+                var isRoomAvailable = await _context.Schedules.AnyAsync(s =>
+                    s.RoomId == roomId &&
+                    s.Date.Date == date.Date &&
+                    s.TimeSlot == timeSlot);
+                if (isRoomAvailable)
+                    throw new InvalidOperationException($"Room {roomId} is already booked for {date:yyyy-MM-dd} at {timeSlot}.");
+
+                // Validate instructor availability
+                var isInstructorAvailable = await _context.Schedules.AnyAsync(s =>
+                    s.InstructorId == instructorId &&
+                    s.Date.Date == date.Date &&
+                    s.TimeSlot == timeSlot);
+                if (isInstructorAvailable)
+                    throw new InvalidOperationException($"Instructor {instructorId} is already booked for {date:yyyy-MM-dd} at {timeSlot}.");
+
+                // Validate course availability
+                var isCourseAvailable = await _context.Schedules.AnyAsync(s =>
+                    s.CourseId == courseId &&
+                    s.Date.Date == date.Date &&
+                    s.TimeSlot == timeSlot);
+                if (isCourseAvailable)
+                    throw new InvalidOperationException($"Course {courseId} is already scheduled for {date:yyyy-MM-dd} at {timeSlot}.");
+
+                // Create a new schedule
+                var schedule = new Schedule
+                {
+                    CourseId = courseId,
+                    InstructorId = instructorId,
+                    RoomId = roomId,
+                    Date = date,
+                    TimeSlot = timeSlot
+                };
+
+                _context.Schedules.Add(schedule);
+                return schedule;
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new InvalidOperationException($"Validation failed: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"An error occurred while creating the schedule: {ex.Message}", ex);
+            }
+        }
+
+
     }
 }
