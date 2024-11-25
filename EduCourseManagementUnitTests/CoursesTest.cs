@@ -36,7 +36,7 @@ public class CoursesControllerTests : IClassFixture<WebApplicationFactory<Progra
     {
         var newCourse = new
         {
-            courseId = 11,
+            courseId = 5,
             title = "Data Science",
             description = "Prediction modules",
             credits = 4
@@ -62,27 +62,27 @@ public class CoursesControllerTests : IClassFixture<WebApplicationFactory<Progra
         Assert.False(string.IsNullOrEmpty(content), "Response content should not be null or empty");
     }
 
- /*   [Fact]
+    [Fact]
     public async Task PutCourse_ShouldUpdateCourse()
     {
         var updatedCourse = new
         {
-            courseId = 11,
+            courseId = 5,
             title = "Data Science",
             description = "Prediction modules",
             credits = 8
         };
 
-        var response = await _client.PutAsync("/api/Courses/11", GetJsonContent(updatedCourse));
+        var response = await _client.PutAsync("/api/Courses/5", GetJsonContent(updatedCourse));
 
         Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);
-    }*/
+    }
 
 
-   [Fact]
+    [Fact]
     public async Task DeleteCourse_ShouldRemoveCourse()
     {
-        var response = await _client.DeleteAsync("/api/Courses/11");
+        var response = await _client.DeleteAsync("/api/Courses/5");
 
         Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);
     }
