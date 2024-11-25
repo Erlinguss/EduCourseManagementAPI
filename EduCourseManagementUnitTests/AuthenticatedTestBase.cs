@@ -12,24 +12,30 @@ public abstract class AuthenticatedTestBase : IClassFixture<WebApplicationFactor
         _client = factory.CreateClient();
     }
 
-    private StringContent GetJsonContent(object obj) =>
+    protected StringContent GetJsonContent(object obj) =>
         new StringContent(JsonSerializer.Serialize(obj), Encoding.UTF8, "application/json");
 
     protected async Task<string> LoginAndGetTokenAsync()
     {
-        var loginCredentials = new
+        var loginRequest = new
         {
             username = "PeterAdmin",
-            password = "admindkit"
+            password = "admindkit",
+            role = "Admin"
         };
 
-        var response = await _client.PostAsync("/api/Auth/Login", GetJsonContent(loginCredentials));
-        response.EnsureSuccessStatusCode();
+        var response = await _client.PostAsync("/api/Auth/Login", GetJsonContent(loginRequest));
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"Login failed. Status Code: {response.StatusCode}, Message: {errorMessage}");
+        }
 
         var content = await response.Content.ReadAsStringAsync();
-        var tokenObject = JsonSerializer.Deserialize<TokenResponse>(content);
+        var result = JsonSerializer.Deserialize<LoginResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        return tokenObject?.Token ?? throw new Exception("Failed to retrieve JWT token.");
+        return result?.Token ?? throw new InvalidOperationException("Token not found in the login response.");
     }
 
     protected async Task<HttpClient> GetAuthorizedClientAsync()
@@ -39,7 +45,8 @@ public abstract class AuthenticatedTestBase : IClassFixture<WebApplicationFactor
         return _client;
     }
 
-    private class TokenResponse
+
+    public class LoginResponse
     {
         public string Token { get; set; }
     }
