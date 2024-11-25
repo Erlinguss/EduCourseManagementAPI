@@ -16,92 +16,125 @@ namespace EducationCourseManagement.Services
 
         public async Task<IEnumerable<CourseDTO>> GetAllCoursesAsync()
         {
-            var courses = await _context.Courses.ToListAsync();
-
-            return courses.Select(c => new CourseDTO
+            try
             {
-                CourseId = c.CourseId,
-                Title = c.Title,
-                Description = c.Description,
-                Credits = c.Credits
-            });
+                var courses = await _context.Courses.ToListAsync();
+
+                return courses.Select(c => new CourseDTO
+                {
+                    CourseId = c.CourseId,
+                    Title = c.Title,
+                    Description = c.Description,
+                    Credits = c.Credits
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error fetching all courses: {ex.Message}", ex);
+            }
         }
 
         public async Task<CourseDTO> GetCourseByIdAsync(int id)
         {
-            var course = await _context.Courses.FindAsync(id);
-
-            if (course == null)
-                return null;
-
-            return new CourseDTO
+            try
             {
-                CourseId = course.CourseId,
-                Title = course.Title,
-                Description = course.Description,
-                Credits = course.Credits
-            };
+                var course = await _context.Courses.FindAsync(id);
+
+                if (course == null)
+                    throw new KeyNotFoundException($"Course with ID {id} not found.");
+
+                return new CourseDTO
+                {
+                    CourseId = course.CourseId,
+                    Title = course.Title,
+                    Description = course.Description,
+                    Credits = course.Credits
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error fetching course by ID {id}: {ex.Message}", ex);
+            }
         }
 
         public async Task<CourseDTO> CreateCourseAsync(CourseDTO courseDTO)
         {
-            if (string.IsNullOrWhiteSpace(courseDTO.Title))
-                throw new ArgumentException("Title is required.");
-
-            if (courseDTO.Credits <= 0)
-                throw new ArgumentException("Credits must be greater than 0.");
-
-            if (await _context.Courses.AnyAsync(c => c.Title == courseDTO.Title))
+            try
             {
-                throw new InvalidOperationException($"A course with the title '{courseDTO.Title}' already exists.");
+                if (string.IsNullOrWhiteSpace(courseDTO.Title))
+                    throw new ArgumentException("Title is required.");
+
+                if (courseDTO.Credits <= 0)
+                    throw new ArgumentException("Credits must be greater than 0.");
+
+                if (await _context.Courses.AnyAsync(c => c.Title == courseDTO.Title))
+                    throw new InvalidOperationException($"A course with the title '{courseDTO.Title}' already exists.");
+
+                var course = new Course
+                {
+                    Title = courseDTO.Title,
+                    Description = courseDTO.Description,
+                    Credits = courseDTO.Credits
+                };
+
+                _context.Courses.Add(course);
+                await _context.SaveChangesAsync();
+
+                courseDTO.CourseId = course.CourseId;
+                return courseDTO;
             }
-
-            var course = new Course
+            catch (Exception ex)
             {
-                Title = courseDTO.Title,
-                Description = courseDTO.Description,
-                Credits = courseDTO.Credits
-            };
-
-            _context.Courses.Add(course);
-            await _context.SaveChangesAsync();
-
-            courseDTO.CourseId = course.CourseId;
-            return courseDTO;
+                throw new Exception($"Error creating course: {ex.Message}", ex);
+            }
         }
 
         public async Task<bool> UpdateCourseAsync(int id, CourseDTO courseDTO)
         {
-            var course = await _context.Courses.FindAsync(id);
-            if (course == null)
-                throw new KeyNotFoundException($"Course with ID {id} not found.");
+            try
+            {
+                var course = await _context.Courses.FindAsync(id);
+                if (course == null)
+                    throw new KeyNotFoundException($"Course with ID {id} not found.");
 
-            if (string.IsNullOrWhiteSpace(courseDTO.Title))
-                throw new ArgumentException("Title is required.");
+                if (string.IsNullOrWhiteSpace(courseDTO.Title))
+                    throw new ArgumentException("Title is required.");
 
-            if (courseDTO.Credits <= 0)
-                throw new ArgumentException("Credits must be greater than 0.");
+                if (courseDTO.Credits <= 0)
+                    throw new ArgumentException("Credits must be greater than 0.");
 
-            course.Title = courseDTO.Title;
-            course.Description = courseDTO.Description;
-            course.Credits = courseDTO.Credits;
+                course.Title = courseDTO.Title;
+                course.Description = courseDTO.Description;
+                course.Credits = courseDTO.Credits;
 
-            _context.Courses.Update(course);
-            await _context.SaveChangesAsync();
+                _context.Courses.Update(course);
+                await _context.SaveChangesAsync();
 
-            return true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error updating course with ID {id}: {ex.Message}", ex);
+            }
         }
 
         public async Task<bool> DeleteCourseAsync(int id)
         {
-            var course = await _context.Courses.FindAsync(id);
-            if (course == null)
-                return false;
+            try
+            {
+                var course = await _context.Courses.FindAsync(id);
+                if (course == null)
+                    throw new KeyNotFoundException($"Course with ID {id} not found.");
 
-            _context.Courses.Remove(course);
-            await _context.SaveChangesAsync();
+                _context.Courses.Remove(course);
+                await _context.SaveChangesAsync();
 
-            return true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting course with ID {id}: {ex.Message}", ex);
+            }
         }
     }
 }
