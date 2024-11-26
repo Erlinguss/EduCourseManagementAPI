@@ -5,7 +5,7 @@ public class Instructor : BaseEntity
 {
     public int InstructorId { get; set; }
 
-    // Navigation property for schedules
+    // Navigation properties
     public ICollection<Schedule> Schedules { get; set; }
     public User User { get; set; }
 }

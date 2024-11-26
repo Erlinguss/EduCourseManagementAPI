@@ -198,7 +198,7 @@ namespace EducationCourseManagement.Services
             }
         }
 
-        // Validate conflicts
+        // Intelligent Schdulling (Validate Schedule)
         public async Task<(bool IsConflict, string Message, Schedule ExistingSchedule, List<string> SuggestedTimeSlots)> ValidatedScheduleAsync(
             int courseId, int instructorId, int roomId, DateTime date, string timeSlot)
         {
