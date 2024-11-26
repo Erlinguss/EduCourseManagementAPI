@@ -6,9 +6,8 @@ public class Course
     public string Title { get; set; }
     public string Description { get; set; }
     public int Credits { get; set; }
+
+    // Navigation properties
     public ICollection<Schedule> Schedules { get; set; }
-
-    // Navigation property for the many-to-many relationship with Students
     public ICollection<StudentCourse> StudentCourses { get; set; }
-
 }

@@ -15,6 +15,7 @@ namespace EducationCourseManagement.Services
             _context = context;
         }
 
+        // Get all instructors
         public async Task<IEnumerable<InstructorDTO>> GetAllInstructorsAsync()
         {
             try
@@ -36,6 +37,7 @@ namespace EducationCourseManagement.Services
             }
         }
 
+        // Get instructor by ID
         public async Task<InstructorDTO> GetInstructorByIdAsync(int id)
         {
             try
@@ -60,6 +62,7 @@ namespace EducationCourseManagement.Services
             }
         }
 
+        // Create instructor
         public async Task<InstructorDTO> CreateInstructorWithUserAsync(int userId, InstructorDTO instructorDTO)
         {
             try
@@ -93,6 +96,7 @@ namespace EducationCourseManagement.Services
             }
         }
 
+        // Update instructor
         public async Task<bool> UpdateInstructorAsync(int id, InstructorDTO instructorDTO)
         {
             try
@@ -115,6 +119,7 @@ namespace EducationCourseManagement.Services
             }
         }
 
+        // Delete instructor
         public async Task<bool> DeleteInstructorAsync(int id)
         {
             try

@@ -6,7 +6,7 @@
         public string RoomName { get; set; }
         public int Capacity { get; set; }
 
-        // Navigation property
+        // Navigation properties
         public ICollection<Schedule> Schedules { get; set; }
     }
 }
