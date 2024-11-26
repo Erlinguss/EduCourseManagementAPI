@@ -59,6 +59,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Register API Key Middleware
+app.UseMiddleware<EduCourseManagementAPI.Middleware.ApiKeyMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
