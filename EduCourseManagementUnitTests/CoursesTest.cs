@@ -59,6 +59,8 @@ namespace EduCourseManagementTest
             var content = await response.Content.ReadAsStringAsync();
             var course = JsonSerializer.Deserialize<CourseDTO>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             var generatedCourseId = course.CourseId;
+
+            // Cleanup
             var deleteResponse = await client.DeleteAsync($"/api/Courses/{generatedCourseId}");
         }
 
@@ -90,6 +92,8 @@ namespace EduCourseManagementTest
 
             var putResponse = await client.PutAsync($"/api/Courses/{generatedCourseId}", GetJsonContent(updatedCourse));
             Assert.Equal(System.Net.HttpStatusCode.NoContent, putResponse.StatusCode);
+
+            // Cleanup
             var deleteResponse = await client.DeleteAsync($"/api/Courses/{generatedCourseId}");
         }
 
@@ -110,6 +114,8 @@ namespace EduCourseManagementTest
             var postContent = await postResponse.Content.ReadAsStringAsync();
             var createdCourse = JsonSerializer.Deserialize<CourseDTO>(postContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             var generatedCourseId = createdCourse.CourseId;
+
+            // Cleanup
             var deleteResponse = await client.DeleteAsync($"/api/Courses/{generatedCourseId}");
             Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);
         }

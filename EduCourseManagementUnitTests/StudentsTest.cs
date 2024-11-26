@@ -62,6 +62,7 @@ namespace EduCourseManagementTest
             var student = JsonSerializer.Deserialize<StudentDTO>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             var generatedStudentId = student.StudentId;
 
+            // Cleanup
             var deleteResponse = await client.DeleteAsync($"/api/Students/{generatedStudentId}");
         }
 
@@ -95,6 +96,7 @@ namespace EduCourseManagementTest
             var putResponse = await client.PutAsync($"/api/Students/{generatedStudentId}", GetJsonContent(updatedStudent));
             Assert.Equal(System.Net.HttpStatusCode.NoContent, putResponse.StatusCode);
 
+            // Cleanup
             var deleteResponse = await client.DeleteAsync($"/api/Students/{generatedStudentId}");
         }
 
@@ -115,6 +117,7 @@ namespace EduCourseManagementTest
             var createdStudent = JsonSerializer.Deserialize<StudentDTO>(postContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             var generatedStudentId = createdStudent.StudentId;
 
+            // Cleanup
             var deleteResponse = await client.DeleteAsync($"/api/Students/{generatedStudentId}");
             Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);
         }
