@@ -44,5 +44,26 @@ namespace EduCourseManagementTest
             Assert.False(string.IsNullOrEmpty(content), "Response content should not be null or empty");
         }
 
-    }
+        [Fact]
+        public async Task PostStudent()
+        {
+            var client = await GetAuthorizedClientAsync();
+            var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var newStudent = new
+            {
+                name = $"Joe{timestamp}",
+                email = $"joe{timestamp}@example.com"
+            };
+
+            var response = await client.PostAsync("/api/Students?userId=1", GetJsonContent(newStudent));
+            Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
+
+            var content = await response.Content.ReadAsStringAsync();
+            var student = JsonSerializer.Deserialize<StudentDTO>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var generatedStudentId = student.StudentId;
+
+            var deleteResponse = await client.DeleteAsync($"/api/Students/{generatedStudentId}");
+        }
+
+
 }
