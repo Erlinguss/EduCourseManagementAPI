@@ -101,7 +101,6 @@ namespace EducationCourseManagement.Controllers
 
             await _context.SaveChangesAsync();
 
-            // Return the userId in the response
             return Ok(new
             {
                 message = "User registered successfully.",
