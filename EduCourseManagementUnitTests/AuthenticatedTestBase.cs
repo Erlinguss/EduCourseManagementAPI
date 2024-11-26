@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using EducationCourseManagement.DTOs;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
@@ -44,7 +45,6 @@ public abstract class AuthenticatedTestBase : IClassFixture<WebApplicationFactor
         _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
         return _client;
     }
-
 
     public class LoginResponse
     {
