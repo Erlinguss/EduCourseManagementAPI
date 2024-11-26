@@ -59,6 +59,7 @@ namespace EduCourseManagementTest
             var instructor = JsonSerializer.Deserialize<InstructorDTO>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             var generatedInstructorId = instructor.InstructorId;
 
+            // Cleanup
             var deleteResponse = await client.DeleteAsync($"/api/Instructors/{generatedInstructorId}");
         }
 
@@ -90,6 +91,7 @@ namespace EduCourseManagementTest
             var putResponse = await client.PutAsync($"/api/Instructors/{generatedInstructorId}", GetJsonContent(updatedInstructor));
             Assert.Equal(System.Net.HttpStatusCode.NoContent, putResponse.StatusCode);
 
+            // Cleanup
             var deleteResponse = await client.DeleteAsync($"/api/Instructors/{generatedInstructorId}");
         }
 
@@ -110,6 +112,7 @@ namespace EduCourseManagementTest
             var createdInstructor = JsonSerializer.Deserialize<InstructorDTO>(postContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             var generatedInstructorId = createdInstructor.InstructorId;
 
+            // Cleanup
             var deleteResponse = await client.DeleteAsync($"/api/Instructors/{generatedInstructorId}");
             Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);
         }
