@@ -74,6 +74,7 @@ namespace EducationCourseManagement.Controllers
             _scheduleService = scheduleService;
         }
 
+        // GET: api/Schedules
         [HttpGet]
         [Authorize(Roles = "Admin,Instructor,Student")]
         public async Task<ActionResult<IEnumerable<ScheduleDTO>>> GetSchedules()
@@ -89,6 +90,7 @@ namespace EducationCourseManagement.Controllers
             }
         }
 
+        // GET: api/Schedules/{id}
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin,Instructor,Student")]
         public async Task<ActionResult<ScheduleDTO>> GetSchedule(int id)
@@ -104,6 +106,7 @@ namespace EducationCourseManagement.Controllers
             }
         }
 
+        // POST: api/Schedules
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ScheduleResponse>> PostSchedule(ScheduleDTO scheduleDTO)
@@ -129,6 +132,7 @@ namespace EducationCourseManagement.Controllers
             }
         }
 
+        // PUT: api/Schedules/{id}
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutSchedule(int id, ScheduleDTO scheduleDTO)
@@ -152,6 +156,7 @@ namespace EducationCourseManagement.Controllers
             }
         }
 
+        // DELETE: api/Schedules/{id}
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteSchedule(int id)
