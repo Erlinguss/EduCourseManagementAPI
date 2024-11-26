@@ -93,6 +93,25 @@ namespace EduCourseManagementTest
             var deleteResponse = await client.DeleteAsync($"/api/Instructors/{generatedInstructorId}");
         }
 
-     
+        [Fact]
+        public async Task DeleteInstructor()
+        {
+            var client = await GetAuthorizedClientAsync();
+            var newInstructor = new
+            {
+                name = $"Joset {Guid.NewGuid()}",
+                email = $"joset{Guid.NewGuid()}@dkit.com"
+            };
+
+            var postResponse = await client.PostAsync("/api/Instructors?userId=1", GetJsonContent(newInstructor));
+            Assert.Equal(System.Net.HttpStatusCode.Created, postResponse.StatusCode);
+
+            var postContent = await postResponse.Content.ReadAsStringAsync();
+            var createdInstructor = JsonSerializer.Deserialize<InstructorDTO>(postContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var generatedInstructorId = createdInstructor.InstructorId;
+
+            var deleteResponse = await client.DeleteAsync($"/api/Instructors/{generatedInstructorId}");
+            Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);
+        }
     }
 }
