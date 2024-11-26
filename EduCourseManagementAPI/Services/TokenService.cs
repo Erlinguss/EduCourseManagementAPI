@@ -38,3 +38,8 @@ namespace EducationCourseManagement.Services
         }
     }
 }
+
+/* The TokenService Class was developed based on:
+ *Microsoft(n.d.) Authenticate users with JWT in ASP.NET Core. Available at: 
+ * https://learn.microsoft.com/en-us/aspnet/core/security/authentication/jwt-authn?view=aspnetcore-9.0 
+ * (Accessed: 17 November 2024).*/
