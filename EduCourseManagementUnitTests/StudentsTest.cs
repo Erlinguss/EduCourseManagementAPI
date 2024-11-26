@@ -65,5 +65,40 @@ namespace EduCourseManagementTest
             var deleteResponse = await client.DeleteAsync($"/api/Students/{generatedStudentId}");
         }
 
+        [Fact]
+        public async Task PutStudent()
+        {
+            var client = await GetAuthorizedClientAsync();
+            var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var newStudent = new
+            {
+                name = $"Joe Rogan {Guid.NewGuid()}",
+                email = $"roganJoe@dkit.com"
+            };
 
+            var postResponse = await client.PostAsync("/api/Students?userId=1", GetJsonContent(newStudent));
+            Assert.Equal(System.Net.HttpStatusCode.Created, postResponse.StatusCode);
+
+            var postContent = await postResponse.Content.ReadAsStringAsync();
+            var createdStudent = JsonSerializer.Deserialize<StudentDTO>(postContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var generatedStudentId = createdStudent.StudentId;
+            Console.WriteLine(generatedStudentId);
+
+            var updatedStudent = new
+            {
+                studentId= generatedStudentId,
+                name = "Joe Rogan",
+                email = "roganJoe@dkit.com"
+            };
+            Console.WriteLine(updatedStudent);
+
+            var putResponse = await client.PutAsync($"/api/Students/{generatedStudentId}", GetJsonContent(updatedStudent));
+            Assert.Equal(System.Net.HttpStatusCode.NoContent, putResponse.StatusCode);
+
+            var deleteResponse = await client.DeleteAsync($"/api/Students/{generatedStudentId}");
+        }
+
+
+        }
+    }
 }
