@@ -12,7 +12,8 @@
 
         public async Task InvokeAsync(HttpContext context, IConfiguration configuration)
         {
-            if (!context.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
+            var headers = context.Request.Headers;
+            if (!headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 await context.Response.WriteAsync("API Key is missing.");
@@ -20,7 +21,6 @@
             }
 
             var configuredApiKey = configuration["ApiKeys:MyApiKey"];
-
             if (!string.Equals(extractedApiKey, configuredApiKey, StringComparison.Ordinal))
             {
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
@@ -30,5 +30,6 @@
 
             await _next(context);
         }
+
     }
 }
