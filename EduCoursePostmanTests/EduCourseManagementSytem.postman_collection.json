@@ -99,6 +99,18 @@
 					"name": "Login",
 					"event": [
 						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
 							"listen": "test",
 							"script": {
 								"exec": [
@@ -116,18 +128,6 @@
 									"} else {\r",
 									"    console.error(`Login failed`);\r",
 									"}\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
 									"\r",
 									"\r",
 									""
@@ -190,7 +190,13 @@
 							}
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": "{{url }}/Courses/1"
 					},
 					"response": []
@@ -225,7 +231,13 @@
 							}
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": "{{url }}/Courses"
 					},
 					"response": []
@@ -282,7 +294,13 @@
 							}
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"title\": \"Service Oriented Architecture\",\r\n  \"description\": \"Microservices CRUD\",\r\n  \"credits\": 4\r\n}",
@@ -335,7 +353,13 @@
 							}
 						},
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"courseId\": {{courseId}},\r\n  \"title\": \"Data Science\",\r\n  \"description\": \"Prediction modules\",\r\n  \"credits\": 8\r\n}",
@@ -396,7 +420,13 @@
 							}
 						},
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": "{{url }}/Courses/{{courseId}}"
 					},
 					"response": []
@@ -453,7 +483,13 @@
 							}
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": "{{url }}/Students"
 					},
 					"response": []
@@ -511,7 +547,13 @@
 							}
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": "{{url }}/Students/3"
 					},
 					"response": []
@@ -579,7 +621,13 @@
 							}
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"name\": \"{{uniqueFullName}}\",\r\n  \"email\": \"{{uniqueEmail}}\"\r\n}\r\n\r\n",
@@ -649,7 +697,13 @@
 							}
 						},
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"studentId\":{{studentId}} ,\r\n  \"name\": \"{{uniqueFullName}} New\",\r\n  \"email\": \"{{uniqueEmail}}\"\r\n}",
@@ -704,7 +758,13 @@
 							}
 						},
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": "{{url }}/Students/{{studentId}}"
 					},
 					"response": []
@@ -758,7 +818,13 @@
 							}
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": "{{url }}/Instructors"
 					},
 					"response": []
@@ -815,7 +881,13 @@
 							}
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": "{{url }}/Instructors/1"
 					},
 					"response": []
@@ -883,7 +955,13 @@
 							}
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n   \"name\": \"{{instructorName}}\",\r\n   \"email\": \"{{instructorEmail}}\"\r\n}",
@@ -952,7 +1030,13 @@
 							}
 						},
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "APiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n   \"instructorId\":{{instructorId}} ,\r\n   \"name\": \"{{instructorName}} Parrell\",\r\n   \"email\": \"{{instructorEmail}}\"\r\n}",
@@ -1006,7 +1090,13 @@
 							}
 						},
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": "{{url }}/Instructors/{{instructorId}}"
 					},
 					"response": []
@@ -1042,7 +1132,13 @@
 							}
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": "{{url }}/Schedules"
 					},
 					"response": []
@@ -1073,7 +1169,13 @@
 							}
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"url": "{{url }}/Schedules/1"
 					},
 					"response": []
@@ -1103,9 +1205,16 @@
 									"\r",
 									"}\r",
 									"\r",
-									"\r",
 									"let responseData = pm.response.json();\r",
-									"pm.environment.set(\"scheduleId\", responseData.scheduleId);"
+									"\r",
+									"// Access the nested scheduleId\r",
+									"if (responseData && responseData.createdSchedule && responseData.createdSchedule.scheduleId) {\r",
+									"    pm.environment.set(\"scheduleId\", responseData.createdSchedule.scheduleId);\r",
+									"    console.log(\"scheduleId saved:\", responseData.createdSchedule.scheduleId);\r",
+									"} else {\r",
+									"    console.log(\"scheduleId not found in the response.\");\r",
+									"}\r",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -1130,10 +1239,16 @@
 							}
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "// { \r\n// \"courseId\": 1, \r\n// \"instructorId\": 1, \r\n// \"date\": \"2024-11-30T09:00:00\", \r\n// \"roomId\":1,\r\n// \"timeSlot\": \"9:00 AM - 10:30 AM\" \r\n// }\r\n\r\n{\r\n  \"courseId\": 1,\r\n  \"instructorId\": 1,\r\n  \"roomId\": 1,\r\n  \"date\": \"2024-11-30T09:00:00\",\r\n  \"timeSlot\": \"1:00 PM - 02:30 PM\",\r\n  \"isAutoGenerated\": false,\r\n  \"generatedBy\": \"{{current_role}}\"\r\n}",
+							"raw": "\r\n{\r\n  \"courseId\": 1,\r\n  \"instructorId\": 1,\r\n  \"roomId\": 1,\r\n  \"date\": \"2024-11-30T09:00:00\",\r\n  \"timeSlot\": \"1:00 PM - 02:30 PM\",\r\n  \"isAutoGenerated\": false,\r\n  \"generatedBy\": \"{{current_role}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1182,10 +1297,16 @@
 							}
 						},
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "\r\n\r\n// {\r\n//   \"scheduleId\": {{scheduleId}},\r\n//   \"courseId\": 1,\r\n//   \"instructorId\": 1,\r\n//   \"roomId\": 1,\r\n//   \"date\": \"2024-11-18T15:10:16.294Z\",\r\n//   \"timeSlot\": \"11:00 AM - 12:30 AM\" \r\n// }\r\n\r\n\r\n// {\r\n//   \"courseId\": 1,\r\n//   \"instructorId\": 1,\r\n//   \"roomId\": 1,\r\n//   \"date\": \"2024-11-30T09:00:00\",\r\n//   \"timeSlot\": \"9:00 AM - 10:30 AM\",\r\n//   \"isAutoGenerated\": false,\r\n//   \"generatedBy\": \"{{current_role}}\"\r\n// }\r\n\r\n\r\n\r\n    {\r\n        \"scheduleId\": {{scheduleId}},\r\n        \"courseId\": 1,\r\n        \"instructorId\": 1,\r\n        \"roomId\": 1,\r\n        \"date\": \"2024-11-30T09:00:00\",\r\n        \"timeSlot\": \"2:30 PM - 04:00 PM\",\r\n        \"isAutoGenerated\": false,\r\n         \"generatedBy\": \"{{current_role}}\"\r\n    }\r\n\r\n",
+							"raw": "\r\n    {\r\n        \"scheduleId\": {{scheduleId}},\r\n        \"courseId\": 1,\r\n        \"instructorId\": 1,\r\n        \"roomId\": 1,\r\n        \"date\": \"2024-11-30T09:00:00\",\r\n        \"timeSlot\": \"2:30 PM - 04:00 PM\",\r\n        \"isAutoGenerated\": false,\r\n         \"generatedBy\": \"{{current_role}}\"\r\n    }\r\n\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1237,7 +1358,13 @@
 							}
 						},
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "ApiKey",
+								"value": "{{ApiKey}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "",
@@ -1254,6 +1381,13 @@
 			]
 		}
 	],
+	"auth": {
+		"type": "apikey",
+		"apikey": {
+			"value": "S3cR3tK3yForMyAPI@2024*EducationCourse#Management",
+			"key": "ApiKey"
+		}
+	},
 	"event": [
 		{
 			"listen": "prerequest",
