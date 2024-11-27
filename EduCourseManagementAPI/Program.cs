@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using EducationCourseManagement.Config;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add DbContext for MySQL
@@ -43,6 +42,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddSingleton(new TokenService(jwtSettings));
 
+// Add CORS Policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontendOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") 
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Add Controllers
 builder.Services.AddControllers();
 
@@ -58,6 +68,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Use CORS Policy
+app.UseCors("AllowFrontendOrigin");
 
 // Register API Key Middleware
 app.UseMiddleware<EduCourseManagementAPI.Middleware.ApiKeyMiddleware>();
