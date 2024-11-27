@@ -1,0 +1,135 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using EduCourseManagementAPI.Interfaces;
+using EducationCourseManagement.DTOs;
+
+namespace EducationCourseManagement.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
+    public class StudentsController : ControllerBase
+    {
+        private readonly IStudentService _studentService;
+
+        public StudentsController(IStudentService studentService)
+        {
+            _studentService = studentService;
+        }
+
+        // GET: api/Students
+        [HttpGet]
+        [Authorize(Roles = "Admin,Instructor")]
+        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetStudents()
+        {
+            try
+            {
+                var students = await _studentService.GetAllStudentsAsync();
+                return Ok(students);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching students.");
+            }
+        }
+
+        // GET: api/Students/{id}
+        [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Instructor")]
+        public async Task<ActionResult<StudentDTO>> GetStudent(int id)
+        {
+            try
+            {
+                var student = await _studentService.GetStudentByIdAsync(id);
+
+                if (student == null)
+                    return NotFound();
+
+                return Ok(student);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching the student.");
+            }
+        }
+
+        // POST: api/Students?userId=
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<StudentDTO>> PostStudentWithUser(int userId, [FromBody] StudentDTO studentDTO)
+        {
+            try
+            {
+                var createdStudent = await _studentService.CreateStudentWithUserAsync(userId, studentDTO);
+                return CreatedAtAction(nameof(GetStudent), new { id = createdStudent.StudentId }, createdStudent);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while creating the student.");
+            }
+        }
+
+        // PUT: api/Students/{id}
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> PutStudent(int id, [FromBody] StudentDTO studentDTO)
+        {
+            try
+            {
+                var updated = await _studentService.UpdateStudentAsync(id, studentDTO);
+                if (!updated)
+                    return NotFound();
+
+                return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while updating the student.");
+            }
+        }
+
+        // DELETE: api/Students/{id}
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteStudent(int id)
+        {
+            try
+            {
+                var deleted = await _studentService.DeleteStudentAsync(id);
+
+                if (!deleted)
+                    return NotFound();
+
+                return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while deleting the student.");
+            }
+        }
+    }
+}
