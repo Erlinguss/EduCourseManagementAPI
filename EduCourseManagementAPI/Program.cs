@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using EducationCourseManagement.Config;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,9 +46,9 @@ builder.Services.AddSingleton(new TokenService(jwtSettings));
 // Add CORS Policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontendOrigin", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") 
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -70,7 +71,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // Use CORS Policy
-app.UseCors("AllowFrontendOrigin");
+app.UseCors("AllowAll");
 
 // Register API Key Middleware
 app.UseMiddleware<EduCourseManagementAPI.Middleware.ApiKeyMiddleware>();
