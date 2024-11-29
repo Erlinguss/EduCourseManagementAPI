@@ -63,7 +63,7 @@ INSERT INTO Courses (Title, Description, Credits) VALUES
 -- Create Students Table
 CREATE TABLE Students (
     StudentId INT PRIMARY KEY AUTO_INCREMENT,
-    UserId INT UNIQUE, -- Link to Users table
+    UserId INT, -- Link to Users table
     Name NVARCHAR(100) NOT NULL,
     Email NVARCHAR(100) UNIQUE NOT NULL,
     FOREIGN KEY (UserId) REFERENCES Users(UserId)
@@ -78,7 +78,7 @@ INSERT INTO Students (UserId, Name, Email) VALUES
 -- Create Instructors Table
 CREATE TABLE Instructors (
     InstructorId INT PRIMARY KEY AUTO_INCREMENT,
-    UserId INT UNIQUE, -- Link to Users table
+    UserId INT, -- Link to Users table
     Name NVARCHAR(100) NOT NULL,
     Email NVARCHAR(100) UNIQUE NOT NULL,
     FOREIGN KEY (UserId) REFERENCES Users(UserId)
