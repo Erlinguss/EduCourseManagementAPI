@@ -19,7 +19,7 @@ namespace EducationCourseManagement.Controllers
 
         // GET: api/Instructors
         [HttpGet]
-        [Authorize(Roles = "Admin,Instructor")]
+        [Authorize(Roles = "Admin,Instructor,Student")]
         public async Task<ActionResult<IEnumerable<InstructorDTO>>> GetInstructors()
         {
             try
@@ -35,7 +35,7 @@ namespace EducationCourseManagement.Controllers
 
         // GET: api/Instructors/{id}
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Instructor")]
+        [Authorize(Roles = "Admin,Instructor,Student")]
         public async Task<ActionResult<InstructorDTO>> GetInstructor(int id)
         {
             try
