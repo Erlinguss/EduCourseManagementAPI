@@ -198,7 +198,7 @@ namespace EducationCourseManagement.Services
             }
         }
 
-        // Intelligent Schdulling (Validate Schedule)
+        // Intelligent Schedulling (Validate Schedule)
         public async Task<(bool IsConflict, string Message, Schedule ExistingSchedule, List<string> SuggestedTimeSlots)> ValidatedScheduleAsync(
             int courseId, int instructorId, int roomId, DateTime date, string timeSlot)
         {
@@ -224,8 +224,8 @@ namespace EducationCourseManagement.Services
 
                     var availableTimeSlots = allTimeSlots.Except(bookedTimeSlots).ToList();
 
-                    return (true, "Conflict detected. Please adjust the schedule.", conflictingSchedule, availableTimeSlots);
-                }
+                    return (true, "This time is already scheduled. Select an alternative.", conflictingSchedule, availableTimeSlots);
+                }      
 
                 return (false, "No conflict detected.", null, null);
             }
